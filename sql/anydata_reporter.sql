@@ -1,89 +1,75 @@
-DROP TYPE anydata_reporter FORCE;
-/
-DROP TYPE anytype_info FORCE;
+DROP PACKAGE anydata_reporter;
 /
 
-CREATE TYPE anytype_info AS OBJECT (
-  prec        INTEGER,
-  scale       INTEGER,
-  len         INTEGER,
-  csid        INTEGER,
-  csfrm       INTEGER,
-  schema_name VARCHAR2(400),
-  type_name   VARCHAR2(400),
-  version     VARCHAR2(400),
-  count       INTEGER,
-  type_code   INTEGER,
-  CONSTRUCTOR FUNCTION anytype_info( pv_value ANYDATA) RETURN SELF AS RESULT,
-  MEMBER FUNCTION get_report RETURN VARCHAR2
-);
-/
+CREATE OR REPLACE PACKAGE anydata_reporter IS
 
-CREATE TYPE BODY anytype_info IS
-  CONSTRUCTOR FUNCTION anytype_info( pv_value ANYDATA) RETURN SELF AS RESULT IS
-    v_type          ANYTYPE;
-    v_name_lst      DBMS_UTILITY.MAXNAME_ARRAY;
-    v_dummy         INTEGER;
-    function in_list( p_string in varchar2, p_separator VARCHAR2 DEFAULT '.' ) return DBMS_UTILITY.MAXNAME_ARRAY IS
-      v_string        VARCHAR2(32767) := p_string||p_separator;
-      v_data          DBMS_UTILITY.MAXNAME_ARRAY;
-      v_start         INTEGER := 1;
-      v_end           INTEGER := instr( v_string, p_separator );
-      i               PLS_INTEGER := 1;
-    begin
-      while v_end > 0 loop
-          v_data(i) := substr( v_string, v_start, v_end-v_start );
-          v_start := v_end + 1;
-          v_end := instr( v_string, p_separator, v_start );
-          i := i + 1;
-      end loop;
+  FUNCTION get_report( p_field_name VARCHAR2, p_field_value ANYDATA ) RETURN VARCHAR2;
 
-      return v_data;
-    end;
-  BEGIN
-    SELF.type_code := pv_value.gettype( v_type );
-    IF v_type IS NULL THEN
-      v_name_lst := in_list( pv_value.GETTYPENAME() );
-      SELF.schema_name := v_name_lst(1);
-      SELF.type_name := v_name_lst(2);
-    ELSE
-      SELF.type_code := v_type.GETINFO(
-        SELF.prec,
-        SELF.scale,
-        SELF.len,
-        SELF.csid,
-        SELF.csfrm,
-        SELF.schema_name,
-        SELF.type_name,
-        SELF.version,
-        SELF.count);
-    END IF;
-    RETURN;
-  END;
-  MEMBER FUNCTION get_report RETURN VARCHAR2 IS
-  BEGIN
-    RETURN type_name||
-      CASE WHEN prec IS NOT NULL THEN
-        '('||prec
-        || CASE WHEN scale IS NOT NULL THEN ','||scale END
-        ||')'
-     END;
-  END;
 END;
 /
 
-CREATE TYPE anydata_reporter AS OBJECT(
-  field_name  VARCHAR2(30),
-  field_value ANYDATA,
-  MEMBER FUNCTION get_report RETURN VARCHAR2
-);
-/
+CREATE OR REPLACE PACKAGE BODY anydata_reporter IS
 
-CREATE TYPE BODY anydata_reporter IS
-  MEMBER FUNCTION get_report RETURN VARCHAR2 IS
-    v_type_info anytype_info := anytype_info( field_value );
-  BEGIN
-    RETURN field_name||'('||v_type_info.get_report()||')=>';
-  END;
+  NEW_LINE         CONSTANT VARCHAR2(2) := CHR(10);
+  INDENT_AMOUNT    CONSTANT PLS_INTEGER := 2;
+
+
+  FUNCTION get_report( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
+
+  FUNCTION report_object( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
+
+
+  FUNCTION report_object( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2 IS
+    v_field          BETTER_ANYDATA := p_field;
+    v_attr_type_info ANYTYPE_INFO;
+    v_result         VARCHAR2(32767);
+    v_elem_idx       INTEGER := 1;
+    BEGIN
+      v_field.base_data.piecewise();
+      LOOP
+        EXIT WHEN v_elem_idx > COALESCE( p_type_info.COUNT, v_elem_idx );
+        BEGIN
+          v_attr_type_info := ANYTYPE_INFO( v_elem_idx, p_type_info.attribute_type );
+          v_result := v_result || NEW_LINE
+                      || get_report( v_field, v_attr_type_info, p_indent ) || ',';
+        EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+            EXIT;
+        END;
+        v_elem_idx := v_elem_idx + 1;
+      END LOOP;
+      v_result := RTRIM(v_result,',') || NEW_LINE;
+      RETURN v_result;
+    END;
+
+  FUNCTION get_report( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2 IS
+    v_indent_str VARCHAR2(1000) := LPAD(' ',p_indent, ' ');
+    BEGIN
+      RETURN v_indent_str || p_type_info.get_report()
+        ||CASE
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_NUMBER   THEN TO_CHAR( p_field.getNumber() )
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_VARCHAR2 THEN '"'||REPLACE( REPLACE( p_field.getVarchar2(),'\','\\'),'"','\"')||'"'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_DATE     THEN TO_CHAR( p_field.getDate(),'YYYY-MM-DD HH24:MI:SS' )
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_BDOUBLE  THEN TO_CHAR( p_field.getBDouble() )
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_BFLOAT   THEN TO_CHAR( p_field.getBFloat() )
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_BLOB     THEN '"'||TO_CHAR( utl_raw.cast_to_varchar2( dbms_lob.substr( p_field.getBlob() ) ) )||'"'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_CHAR     THEN '"'||TRIM(p_field.getChar())||'"'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_CLOB     THEN '"'||dbms_lob.substr( p_field.getClob() )||'"'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_OBJECT   THEN '{'||report_object( p_field, p_type_info, p_indent + INDENT_AMOUNT )||'}'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_VARRAY   THEN '['||report_object( p_field, p_type_info, p_indent + INDENT_AMOUNT )||']'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_TABLE    THEN '['||report_object( p_field, p_type_info, p_indent + INDENT_AMOUNT )||']'
+          WHEN p_type_info.type_code = DBMS_TYPES.TYPECODE_NAMEDCOLLECTION THEN '['||report_object( p_field, p_type_info, p_indent + INDENT_AMOUNT )||']'
+        END;
+    END;
+
+  FUNCTION get_report( p_field_name VARCHAR2, p_field_value ANYDATA ) RETURN VARCHAR2 IS
+    v_type_info  ANYTYPE_INFO := ANYTYPE_INFO( p_field_name, p_field_value );
+    v_field      BETTER_ANYDATA := BETTER_ANYDATA( p_field_value );
+    BEGIN
+      DBMS_OUTPUT.enable(null);
+      DBMS_OUTPUT.PUT_LINE('v_type_info.type_name: '||v_type_info.type_name);
+      RETURN get_report( v_field, v_type_info, 0 );
+    END;
+
 END;
 /

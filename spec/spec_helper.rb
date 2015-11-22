@@ -20,9 +20,9 @@ database_config.each do |name, params|
   # reduce network traffic in case of large resultsets
   plsql(name).connection.prefetch_rows = 100
   # log DBMS_OUTPUT to standard output
-  if ENV['PLSQL_DBMS_OUTPUT']
+  # if ENV['PLSQL_DBMS_OUTPUT']
     plsql(name).dbms_output_stream = STDOUT
-  end
+  # end
 
   # start code coverage collection
   if ENV['PLSQL_COVERAGE']
