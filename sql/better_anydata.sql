@@ -21,13 +21,62 @@ MEMBER FUNCTION getTimestamp return TIMESTAMP,
 MEMBER FUNCTION getTimestampLTZ return TIMESTAMP WITH LOCAL TIME ZONE,
 MEMBER FUNCTION getTimestampTZ return TIMESTAMP WITH TIME ZONE,
 MEMBER FUNCTION getVarchar return VARCHAR,
-MEMBER FUNCTION getVarchar2 return VARCHAR2
---MEMBER FUNCTION GetCollection RETURN ANYDATA,
---MEMBER FUNCTION GetObject RETURN ANYDATA
+MEMBER FUNCTION getVarchar2 return VARCHAR2,
+MEMBER FUNCTION GetCollection( SELF IN OUT NOCOPY BETTER_ANYDATA, p_type_info ANYTYPE_INFO ) RETURN BETTER_ANYDATA,
+MEMBER FUNCTION GetObject( SELF IN OUT NOCOPY BETTER_ANYDATA, p_type_info ANYTYPE_INFO ) RETURN BETTER_ANYDATA
 );
 /
 
 CREATE TYPE BODY better_anydata AS
+
+  MEMBER FUNCTION GetCollection( SELF IN OUT NOCOPY BETTER_ANYDATA, p_type_info ANYTYPE_INFO ) RETURN BETTER_ANYDATA IS
+    v_sql VARCHAR2(32767);
+    v_out_anydata ANYDATA;
+    BEGIN
+      v_sql :='
+        DECLARE
+          v_obj '||p_type_info.get_typename()||';
+          v_in_data ANYDATA;
+        BEGIN
+          v_in_data := :base_data_in;
+          IF v_in_data.getTypeName() != '''||p_type_info.get_typename()||''' THEN
+            v_in_data.piecewise();
+          END IF;
+          IF v_in_data.getCollection( v_obj ) = DBMS_TYPES.NO_DATA THEN
+            RAISE NO_DATA_FOUND;
+          END IF;
+          :base_data_out := v_in_data;
+          :v_out_anydata := ANYDATA.convertCollection( v_obj );
+        END;';
+      EXECUTE IMMEDIATE v_sql USING IN base_data, OUT base_data, OUT v_out_anydata;
+      RETURN BETTER_ANYDATA( v_out_anydata );
+    END;
+
+  MEMBER FUNCTION GetObject( SELF IN OUT NOCOPY BETTER_ANYDATA, p_type_info ANYTYPE_INFO ) RETURN BETTER_ANYDATA IS
+    v_out_anydata ANYDATA;
+    v_sql VARCHAR2(32767);
+    BEGIN
+      v_sql := '
+      DECLARE
+        v_in_data ANYDATA;
+        FUNCTION extract_object( p_in_out_data IN OUT NOCOPY ANYDATA) RETURN '||p_type_info.get_typename()||' IS
+          v_obj '||p_type_info.get_typename()||';
+        BEGIN
+          IF p_in_out_data.getTypeName() != '''||p_type_info.get_typename()||''' THEN
+            p_in_out_data.piecewise();
+          END IF;
+          IF p_in_out_data.getObject( v_obj ) = DBMS_TYPES.NO_DATA THEN
+            RAISE NO_DATA_FOUND;
+          END IF;
+          RETURN v_obj;
+        END;
+       BEGIN
+          :v_out_anydata := ANYDATA.convertObject( extract_object( :base_data_in_out ) );
+       END;';
+      EXECUTE IMMEDIATE v_sql USING OUT v_out_anydata, IN OUT base_data;
+      RETURN BETTER_ANYDATA( v_out_anydata );
+    END;
+
   MEMBER FUNCTION getBDouble return BINARY_DOUBLE IS
     v_result BINARY_DOUBLE;
     BEGIN
@@ -198,10 +247,6 @@ CREATE TYPE BODY better_anydata AS
       END IF;
       RETURN v_result;
     END;
-
---   MEMBER FUNCTION GetCollection RETURN ANYDATA IS
-
---   MEMBER FUNCTION GetObject RETURN ANYDATA IS
 
 END;
 /

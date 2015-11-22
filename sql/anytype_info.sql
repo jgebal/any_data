@@ -18,6 +18,7 @@ CONSTRUCTOR FUNCTION anytype_info( pv_child_position PLS_INTEGER, pv_parent_type
 MEMBER PROCEDURE update_from_attribute_type(SELF IN OUT NOCOPY anytype_info),
 MEMBER PROCEDURE map_typecode_to_typename,
 MEMBER FUNCTION get_report RETURN VARCHAR2,
+MEMBER FUNCTION get_typename RETURN VARCHAR2,
 MEMBER FUNCTION to_string RETURN VARCHAR2
 );
 /
@@ -98,6 +99,10 @@ CREATE TYPE BODY anytype_info IS
       RETURN;
     END;
 
+  MEMBER FUNCTION get_typename RETURN VARCHAR2 IS
+  BEGIN
+    RETURN schema_name||'.'||type_name;
+  END;
   MEMBER FUNCTION get_report RETURN VARCHAR2 IS
     BEGIN
       RETURN
