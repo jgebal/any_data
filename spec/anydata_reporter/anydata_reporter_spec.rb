@@ -131,12 +131,12 @@ describe 'anydata reporter' do
       test_collection="test_obj_col( #{test_object},#{test_object} )"
       expected = 'PV_COL(TEST_OBJ_COL) => [
   (TEST_OBJ) => {
-    TEXT(VARCHAR2(100) => "test",
-    ID(NUMBER(20,0) => 1
+    TEXT(VARCHAR2(100)) => "test",
+    ID(NUMBER(20,0)) => 1
   },
   (TEST_OBJ) => {
-    TEXT(VARCHAR2(100) => "test",
-    ID(NUMBER(20,0) => 1
+    TEXT(VARCHAR2(100)) => "test",
+    ID(NUMBER(20,0)) => 1
   }
 ]'
       expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
