@@ -1,17 +1,10 @@
-CREATE OR REPLACE PACKAGE anydata_reporter IS
+create or replace package anydata_reporter is
 
-  NEW_LINE         CONSTANT VARCHAR2(2) := CHR(10);
-  INDENT_AMOUNT    CONSTANT PLS_INTEGER := 2;
+   NEW_LINE constant varchar2(2) := CHR( 10 );
+   INDENT_AMOUNT constant pls_integer := 2;
 
-  FUNCTION get_report( p_field_name VARCHAR2, p_field_value ANYDATA, p_indent INTEGER := 0 ) RETURN VARCHAR2;
+   function get_report( p_field_name varchar2, p_field_value ANYDATA, p_indent integer := 0 )
+      return varchar2;
 
-  FUNCTION get_report( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
-
-  FUNCTION report_complex_type( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
-
-  FUNCTION report_object_type( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
-
-  FUNCTION report_collection_type( p_field BETTER_ANYDATA, p_type_info ANYTYPE_INFO, p_indent INTEGER ) RETURN VARCHAR2;
-
-END;
+end;
 /
