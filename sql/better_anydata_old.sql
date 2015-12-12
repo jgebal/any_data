@@ -1,5 +1,4 @@
 drop type better_anydata force;
-
 /
 
 create type better_anydata as object (
@@ -47,7 +46,6 @@ member function GetCollection( self in out nocopy BETTER_ANYDATA, p_type_info AN
 member function GetObject( self in out nocopy BETTER_ANYDATA, p_type_info ANYTYPE_INFO )
       return BETTER_ANYDATA
 );
-
 /
 
 create type body better_anydata as

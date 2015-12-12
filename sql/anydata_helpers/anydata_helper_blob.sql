@@ -9,8 +9,15 @@ create or replace type anydata_helper_blob under anydata_helper_base (
 create or replace type body anydata_helper_blob as
    constructor function anydata_helper_blob return self as result is
       begin
-         self.initialize( DBMS_TYPES.TYPECODE_BLOB, 'BLOB', 'Blob',
-                          '''"'' || TO_CHAR( utl_raw.cast_to_varchar2( dbms_lob.substr( '||anytype_helper_const.anydata_getter_place||', '||anytype_helper_const.max_data_length||' ) ) ) || ''"''' );
+         self.initialize( DBMS_TYPES.TYPECODE_BFILE, 'BLOB', 'Blob',
+                          --dyn_sql_helper.to_char(
+                             dyn_sql_helper.utl_raw_cast_to_varchar2(
+                                dyn_sql_helper.dbms_lob_substr(
+                                   dyn_sql_helper.to_sting_placeholder,
+                                   dyn_sql_helper.max_return_data_length )
+                             )
+                          --)
+         );
          return;
       end;
    end;

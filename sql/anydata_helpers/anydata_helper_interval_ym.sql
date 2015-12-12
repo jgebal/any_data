@@ -10,7 +10,8 @@ create or replace type body anydata_helper_interval_ym as
    constructor function anydata_helper_interval_ym return self as result is
       begin
          self.initialize( DBMS_TYPES.TYPECODE_INTERVAL_YM, 'INTERVAL YEAR TO MONTH', 'IntervalYM',
-                          'TO_CHAR( '||anytype_helper_const.anydata_getter_place||' )' );
+                          dyn_sql_helper.to_char( dyn_sql_helper.to_sting_placeholder )
+         );
          return;
       end;
    end;

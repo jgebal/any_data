@@ -9,8 +9,14 @@ create or replace type anydata_helper_clob under anydata_helper_base (
 create or replace type body anydata_helper_clob as
    constructor function anydata_helper_clob return self as result is
       begin
-         self.initialize( DBMS_TYPES.TYPECODE_CLOB, 'CLOB', 'Clob',
-                          '''"'' || TO_CHAR( dbms_lob.substr( '||anytype_helper_const.anydata_getter_place||', '||anytype_helper_const.max_data_length||' ) ) || ''"''' );
+         self.initialize( dbms_types.typecode_bfile, 'CLOB', 'Clob',
+                          dyn_sql_helper.to_char(
+                             dyn_sql_helper.dbms_lob_substr(
+                                dyn_sql_helper.to_sting_placeholder,
+                                dyn_sql_helper.max_return_data_length
+                             )
+                          )
+         );
          return;
       end;
    end;

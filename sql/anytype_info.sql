@@ -30,7 +30,7 @@ member function to_string
 );
 /
 
-create type body anytype_info is
+create or replace type body anytype_info is
 member procedure update_from_attribute_type( self in out nocopy anytype_info ) is
       begin
          self.type_code := self.attribute_type.getinfo(
@@ -57,17 +57,17 @@ member procedure update_from_attribute_type( self in out nocopy anytype_info ) i
    constructor function anytype_info ( pv_child_position pls_integer, pv_parent_type anytype ) return self as result is
       begin
          if pv_parent_type is not null then
-            SELF.type_code := pv_parent_type.getAttrElemInfo(
+            self.type_code := pv_parent_type.getAttrElemInfo(
                pv_child_position,
-               SELF.prec,
-               SELF.scale,
-               SELF.len,
-               SELF.csid,
-               SELF.csfrm,
-               SELF.attribute_type,
-               SELF.attribute_name
+               self.prec,
+               self.scale,
+               self.len,
+               self.csid,
+               self.csfrm,
+               self.attribute_type,
+               self.attribute_name
             );
-            SELF.update_from_attribute_type( );
+            self.update_from_attribute_type( );
          end if;
          return;
       end;
@@ -93,37 +93,37 @@ member function get_report
 member function get_type
       return varchar2 is
       begin
-         return type_name;
---         return get_typename( )
---                 || case
---                    when prec is not null and not ( prec = 0 and NVL( scale, 0 ) = -127 )
---                       then
---                          '(' || prec || case when scale is not null
---                             then ',' || scale end || ')'
---                    when len is not null
---                       then
---                          '(' || len || ')'
---                    end;
+--         return type_name;
+        return get_typename( )
+                || case
+                   when prec is not null and not ( prec = 0 and NVL( scale, 0 ) = -127 )
+                      then
+                         '(' || prec || case when scale is not null
+                            then ',' || scale end || ')'
+                   when len is not null
+                      then
+                         '(' || len || ')'
+                   end;
       end;
 
 
 member function to_string
       return varchar2 is
       begin
-         return 'attribute_name=> ' || SELF.attribute_name || '
-attribute_type => ' || case when SELF.attribute_type is null
+         return 'attribute_name=> ' || self.attribute_name || '
+attribute_type => ' || case when self.attribute_type is null
             then 'NULL'
                        else 'NOT NULL' end || '
-prec          => ' || SELF.prec || '
-scale         => ' || SELF.scale || '
-len           => ' || SELF.len || '
-csid          => ' || SELF.csid || '
-csfrm         => ' || SELF.csfrm || '
-schema_name   => ' || SELF.schema_name || '
-type_name     => ' || SELF.type_name || '
-version       => ' || SELF.version || '
-type_code     => ' || SELF.type_code || '
-count         => ' || SELF.count;
+prec          => ' || self.prec || '
+scale         => ' || self.scale || '
+len           => ' || self.len || '
+csid          => ' || self.csid || '
+csfrm         => ' || self.csfrm || '
+schema_name   => ' || self.schema_name || '
+type_name     => ' || self.type_name || '
+version       => ' || self.version || '
+type_code     => ' || self.type_code || '
+count         => ' || self.count;
       end;
    end;
 /

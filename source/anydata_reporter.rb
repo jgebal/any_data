@@ -1,7 +1,8 @@
 require_relative 'support/execute_sql_file'
 
 execute_sql_file('../../../sql/anytype_info.sql')
-execute_sql_file('../../../sql/anytype_helper_const.pks')
+execute_sql_file('../../../sql/dyn_sql_helper.pks')
+execute_sql_file('../../../sql/dyn_sql_helper.pkb')
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_base.sql')
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_number.sql')
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_char.sql')
@@ -26,8 +27,5 @@ execute_sql_file('../../../sql/anydata_helpers/anydata_helper_timestamp_ltz.sql'
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_bdouble.sql')
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_bfile.sql')
 execute_sql_file('../../../sql/anydata_helpers/anydata_helper_raw.sql')
-execute_sql_file('../../../sql/anydata_element.sql')
-execute_sql_file('../../../sql/anytype_map.pks')
-execute_sql_file('../../../sql/anytype_map.pkb')
 execute_sql_file('../../../sql/anydata_reporter.pks')
 execute_sql_file('../../../sql/anydata_reporter.pkb')

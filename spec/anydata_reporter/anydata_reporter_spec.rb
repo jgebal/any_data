@@ -22,16 +22,16 @@ describe 'anydata reporter' do
 
     it 'reports a VARCHAR2 datatype' do
       result = exec_reporter 'V_VARCHAR2', "ANYDATA.ConvertVarchar2( 'Sample varchar' )"
-      expect( result ).to eq 'V_VARCHAR2(VARCHAR2) => "Sample varchar"'
+      expect( result ).to eq 'V_VARCHAR2(VARCHAR2) => Sample varchar'
     end
 
     [
       {type: 'DATE', in_name: 'MY_VARIABLE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: 'MY_VARIABLE(DATE) => 2015-11-21 20:01:01'},
       {type: 'BINARY_DOUBLE', in_name: 'MY_VARIABLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: 'MY_VARIABLE(BINARY_DOUBLE) => 1.23456789E+002'},
       {type: 'BINARY_FLOAT', in_name: 'SOME_VARIABLE', in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: 'SOME_VARIABLE(BINARY_FLOAT) => 1.23456001E+002'},
-      {type: 'BLOB',in_name: 'MY_VARIABLE',   in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: 'MY_VARIABLE(BLOB) => "1234%$#$%DRGSDFG$#%"'},
-      {type: 'CHAR',in_name: 'SOME_VARIABLE', in_val: "ANYDATA.ConvertChar('A')", expected: 'SOME_VARIABLE(CHAR) => "A"'},
-      {type: 'CLOB',in_name: 'VAR', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'VAR(CLOB) => "clob value"'},
+      {type: 'BLOB',in_name: 'MY_VARIABLE',   in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: 'MY_VARIABLE(BLOB) => 1234%$#$%DRGSDFG$#%'},
+      {type: 'CHAR',in_name: 'SOME_VARIABLE', in_val: "ANYDATA.ConvertChar( 'A' )", expected: 'SOME_VARIABLE(CHAR) => A'},
+      {type: 'CLOB',in_name: 'VAR', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'VAR(CLOB) => clob value'},
     ].each do |test_case|
       it "reports a #{test_case[:type]} datatype" do
         expect( exec_reporter test_case[:in_name], test_case[:in_val] ).to eq test_case[:expected]
