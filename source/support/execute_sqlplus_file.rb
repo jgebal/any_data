@@ -1,4 +1,4 @@
-def execute_sql_file(file_name)
+def execute_sqlplus_file(file_name)
   proftab_file = File.expand_path(file_name, __FILE__)
   File.read(proftab_file).split(";\n/\n").each do |sql|
     # puts sql+';'

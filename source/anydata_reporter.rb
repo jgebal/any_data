@@ -1,31 +1,33 @@
-require_relative 'support/execute_sql_file'
+require_relative 'support/execute_sqlplus_file'
 
-execute_sql_file('../../../sql/anytype_info.sql')
-execute_sql_file('../../../sql/dyn_sql_helper.pks')
-execute_sql_file('../../../sql/dyn_sql_helper.pkb')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_base.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_number.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_char.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_timestamp.sql')
+[
+  '../../../sql/anytype_info.sql',
+  '../../../sql/dyn_sql_helper.pks',
+  '../../../sql/dyn_sql_helper.pkb',
+  '../../../sql/anydata_helpers/anydata_helper_base.sql',
+  '../../../sql/anydata_helpers/anydata_helper_number.sql',
+  '../../../sql/anydata_helpers/anydata_helper_char.sql',
+  '../../../sql/anydata_helpers/anydata_helper_timestamp.sql',
+  '../../../sql/anydata_helpers/anydata_helper_clob.sql',
+  '../../../sql/anydata_helpers/anydata_helper_collection.sql',
+  '../../../sql/anydata_helpers/anydata_helper_nchar.sql',
+  '../../../sql/anydata_helpers/anydata_helper_varchar2.sql',
+  '../../../sql/anydata_helpers/anydata_helper_cfile.sql',
+  '../../../sql/anydata_helpers/anydata_helper_varchar.sql',
+  '../../../sql/anydata_helpers/anydata_helper_bfloat.sql',
+  '../../../sql/anydata_helpers/anydata_helper_date.sql',
+  '../../../sql/anydata_helpers/anydata_helper_interval_ds.sql',
+  '../../../sql/anydata_helpers/anydata_helper_object.sql',
+  '../../../sql/anydata_helpers/anydata_helper_blob.sql',
+  '../../../sql/anydata_helpers/anydata_helper_timestamp_tz.sql',
+  '../../../sql/anydata_helpers/anydata_helper_nvarchar2.sql',
+  '../../../sql/anydata_helpers/anydata_helper_interval_ym.sql',
+  '../../../sql/anydata_helpers/anydata_helper_nclob.sql',
+  '../../../sql/anydata_helpers/anydata_helper_timestamp_ltz.sql',
+  '../../../sql/anydata_helpers/anydata_helper_bdouble.sql',
+  '../../../sql/anydata_helpers/anydata_helper_bfile.sql',
+  '../../../sql/anydata_helpers/anydata_helper_raw.sql',
+  '../../../sql/anydata_reporter.pks',
+  '../../../sql/anydata_reporter.pkb'
+].each { |file| execute_sqlplus_file(file) }
 
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_clob.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_collection.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_nchar.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_varchar2.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_cfile.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_varchar.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_bfloat.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_date.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_interval_ds.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_object.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_blob.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_timestamp_tz.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_nvarchar2.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_interval_ym.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_nclob.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_timestamp_ltz.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_bdouble.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_bfile.sql')
-execute_sql_file('../../../sql/anydata_helpers/anydata_helper_raw.sql')
-execute_sql_file('../../../sql/anydata_reporter.pks')
-execute_sql_file('../../../sql/anydata_reporter.pkb')
