@@ -9,7 +9,7 @@ constructor function anydata_helper_date return self as result
 create or replace type body anydata_helper_date as
    constructor function anydata_helper_date return self as result is
       begin
-         self.initialize( dbms_types.typecode_date, 'DATE', 'Date',
+         self.initialize( 'Date',
                           dyn_sql_helper.to_char( dyn_sql_helper.to_sting_placeholder, 'YYYY-MM-DD HH24:MI:SS' )
          );
          return;

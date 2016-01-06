@@ -9,7 +9,7 @@ create or replace type anydata_helper_varchar under anydata_helper_char (
 create or replace type body anydata_helper_varchar as
    constructor function anydata_helper_varchar return self as result is
       begin
-         self.initialize( DBMS_TYPES.TYPECODE_VARCHAR, 'VARCHAR', 'Varchar');
+         self.initialize( 'Varchar');
          return;
       end;
    end;

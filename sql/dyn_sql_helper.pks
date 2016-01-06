@@ -1,5 +1,7 @@
 create or replace package dyn_sql_helper as
-   to_sting_placeholder constant varchar2(30) := '{to_sting_placeholder}';
+   to_sting_placeholder      constant varchar2(30) := '{to_sting_placeholder}';
+   piecewise_pos_placeholder constant varchar2(30) := '{piecewise_pos_placeholder}';
+   typecode_placeholder      constant varchar2(30) := '{typecode_placeholder}';
    max_return_data_length constant integer := 100;
 
    function to_char( p_variable varchar2, p_format_string varchar2 := null )

@@ -9,7 +9,7 @@ create or replace type anydata_helper_bdouble under anydata_helper_number (
 create or replace type body anydata_helper_bdouble as
    constructor function anydata_helper_bdouble return self as result is
       begin
-         self.initialize( DBMS_TYPES.TYPECODE_BDOUBLE, 'BINARY_DOUBLE', 'BDouble' );
+         self.initialize( 'BDouble' );
          return;
       end;
    end;

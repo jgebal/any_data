@@ -9,7 +9,7 @@ create or replace type anydata_helper_bfile under anydata_helper_base (
 create or replace type body anydata_helper_bfile as
    constructor function anydata_helper_bfile return self as result is
       begin
-         self.initialize( DBMS_TYPES.TYPECODE_BFILE, 'BFILE', 'Bfile',
+         self.initialize( 'Bfile',
                           dyn_sql_helper.utl_raw_cast_to_varchar2(
                              dyn_sql_helper.dbms_lob_substr(
                                 dyn_sql_helper.to_sting_placeholder,
