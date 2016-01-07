@@ -2,7 +2,7 @@ drop type anydata_raw force;
 /
 
 create or replace type anydata_raw under anydata_base (
-  constructor function anydata_raw return self as result
+constructor function anydata_raw return self as result
 );
 /
 
@@ -18,5 +18,5 @@ create or replace type body anydata_raw as
          );
          return;
       end;
-   end;
+end;
 /

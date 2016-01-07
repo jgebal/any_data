@@ -58,12 +58,12 @@ create or replace type body anytype_info is
          return;
       end;
 
-constructor function anytype_info ( pv_type_code integer ) return self as result is
-   begin
-      self.type_code := pv_type_code;
-      self.build_in_type_name := anytype_info.get_build_in_typename( self.type_code );
-      return;
-   end;
+   constructor function anytype_info ( pv_type_code integer ) return self as result is
+      begin
+         self.type_code := pv_type_code;
+         self.build_in_type_name := anytype_info.get_build_in_typename( self.type_code );
+         return;
+      end;
 
 member procedure update_from_attribute_type( self in out nocopy anytype_info ) is
       begin
@@ -94,6 +94,7 @@ member function get_type_name
          else schema_name || '.' || type_name
          end;
       end;
+
 member function get_report
       return varchar2 is
       begin

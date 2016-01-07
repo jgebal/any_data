@@ -2,7 +2,7 @@ drop type anydata_bfile force;
 /
 
 create or replace type anydata_bfile under anydata_base (
-  constructor function anydata_bfile return self as result
+constructor function anydata_bfile return self as result
 );
 /
 
@@ -18,5 +18,5 @@ create or replace type body anydata_bfile as
          );
          return;
       end;
-   end;
+end;
 /

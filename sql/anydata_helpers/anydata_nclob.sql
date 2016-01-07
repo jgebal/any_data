@@ -2,7 +2,7 @@ drop type anydata_nclob force;
 /
 
 create or replace type anydata_nclob under anydata_base (
-  constructor function anydata_nclob return self as result
+constructor function anydata_nclob return self as result
 );
 /
 
@@ -19,5 +19,5 @@ create or replace type body anydata_nclob as
          );
          return;
       end;
-   end;
+end;
 /

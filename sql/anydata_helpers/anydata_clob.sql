@@ -2,7 +2,7 @@ drop type anydata_clob force;
 /
 
 create or replace type anydata_clob under anydata_base (
-  constructor function anydata_clob return self as result
+constructor function anydata_clob return self as result
 );
 /
 
@@ -19,5 +19,5 @@ create or replace type body anydata_clob as
          );
          return;
       end;
-   end;
+end;
 /

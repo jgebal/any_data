@@ -9,23 +9,17 @@ create or replace package anydata_helper as
    indent_string constant varchar2(30) := lpad( ' ', indent_amount );
 
 
-   function to_char( p_variable varchar2, p_format_string varchar2 := null )
-      return varchar2;
+   function to_char( p_variable varchar2, p_format_string varchar2 := null ) return varchar2;
 
-   function substr( p_variable varchar2, p_start int, p_how_many int := null )
-      return varchar2;
+   function substr( p_variable varchar2, p_start int, p_how_many int := null ) return varchar2;
 
-   function dbms_lob_substr( p_variable varchar2, p_how_many int, p_start int := null )
-      return varchar2;
+   function dbms_lob_substr( p_variable varchar2, p_how_many int, p_start int := null ) return varchar2;
 
-   function utl_raw_cast_to_varchar2( p_variable varchar2 )
-      return varchar2;
+   function utl_raw_cast_to_varchar2( p_variable varchar2 ) return varchar2;
 
-   function trim( p_variable varchar2 )
-      return varchar2;
+   function trim( p_variable varchar2 ) return varchar2;
 
-   function indent_lines( p_string varchar2 )
-      return varchar2;
+   function indent_lines( p_string varchar2 ) return varchar2;
 
 end;
 /

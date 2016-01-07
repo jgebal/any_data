@@ -2,7 +2,7 @@ drop type anydata_interval_ds force;
 /
 
 create or replace type anydata_interval_ds under anydata_base (
-  constructor function anydata_interval_ds return self as result
+constructor function anydata_interval_ds return self as result
 );
 /
 
@@ -14,6 +14,6 @@ create or replace type body anydata_interval_ds as
          );
          return;
       end;
-   end;
+end;
 /
 
