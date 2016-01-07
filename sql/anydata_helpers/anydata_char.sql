@@ -1,31 +1,31 @@
-drop type anydata_helper_char force;
+drop type anydata_char force;
 /
 
-create or replace type anydata_helper_char under anydata_helper_base (
+create or replace type anydata_char under anydata_base (
    member procedure initialize( p_function_suffix varchar2),
    overriding member function get_type_string return varchar2,
-   constructor function anydata_helper_char return self as result
+   constructor function anydata_char return self as result
 ) not final;
 /
 
-create or replace type body anydata_helper_char as
+create or replace type body anydata_char as
    member procedure initialize( p_function_suffix varchar2 ) is
       begin
          self.initialize(
             p_function_suffix,
             '''"''||'
-            || dyn_sql_helper.substr(
+            || anydata_helper.substr(
                   --need trim as anydata returns a char 32767 from any convert from CHAR datatype
-                  dyn_sql_helper.trim(
-                     dyn_sql_helper.to_sting_placeholder
+                  anydata_helper.trim(
+                     anydata_helper.to_sting_placeholder
                   ),
                   1,
-                  dyn_sql_helper.max_return_data_length - 2
+                  anydata_helper.max_return_data_length - 2
                )
             || '||''"'''
          );
       end;
-   constructor function anydata_helper_char return self as result is
+   constructor function anydata_char return self as result is
       begin
          initialize( 'Char' );
          return;

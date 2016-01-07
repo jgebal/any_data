@@ -1,8 +1,13 @@
-create or replace package dyn_sql_helper as
-   to_sting_placeholder      constant varchar2(30) := '{to_sting_placeholder}';
+create or replace package anydata_helper as
+
+   to_sting_placeholder constant varchar2(30) := '{to_sting_placeholder}';
    piecewise_pos_placeholder constant varchar2(30) := '{piecewise_pos_placeholder}';
-   typecode_placeholder      constant varchar2(30) := '{typecode_placeholder}';
+   typecode_placeholder constant varchar2(30) := '{typecode_placeholder}';
    max_return_data_length constant integer := 100;
+   new_line constant varchar2(2) := CHR( 10 );
+   indent_amount constant pls_integer := 2;
+   indent_string constant varchar2(30) := lpad( ' ', indent_amount );
+
 
    function to_char( p_variable varchar2, p_format_string varchar2 := null )
       return varchar2;
@@ -17,6 +22,9 @@ create or replace package dyn_sql_helper as
       return varchar2;
 
    function trim( p_variable varchar2 )
+      return varchar2;
+
+   function indent_lines( p_string varchar2 )
       return varchar2;
 
 end;
