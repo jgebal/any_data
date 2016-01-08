@@ -22,8 +22,9 @@ final member function get_sql_for_piecewise_string return varchar2,
 final member function get_child_type_info( pv_child_position pls_integer ) return anytype_info,
 final member procedure set_datatype_length( p_length integer),
 final static function construct( p_type_code integer ) return anydata_base,
-final static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base
-) not final not instantiable;
+final static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base,
+constructor function anydata_base( p_function_suffix varchar2, p_string_data_getter varchar2 ) return self as result
+) not final;
 /
 
 create or replace type body anydata_base as
@@ -134,30 +135,123 @@ final static function construct( p_type_code integer ) return anydata_base is
       v_result anydata_base;
       begin
          case
-            when p_type_code = dbms_types.typecode_date then v_result := anydata_date( );
-            when p_type_code = dbms_types.typecode_number then v_result := anydata_number( );
-            when p_type_code = dbms_types.typecode_raw then v_result := anydata_raw( );
-            when p_type_code = dbms_types.typecode_char then v_result := anydata_char( );
-            when p_type_code = dbms_types.typecode_varchar2 then v_result := anydata_varchar2( );
-            when p_type_code = dbms_types.typecode_varchar then v_result := anydata_varchar( );
-            when p_type_code = dbms_types.typecode_blob then v_result := anydata_blob( );
-            when p_type_code = dbms_types.typecode_bfile then v_result := anydata_bfile( );
-            when p_type_code = dbms_types.typecode_clob then v_result := anydata_clob( );
-            when p_type_code = dbms_types.typecode_cfile then v_result := anydata_cfile( );
-            when p_type_code = dbms_types.typecode_timestamp then v_result := anydata_timestamp( );
-            when p_type_code = dbms_types.typecode_timestamp_tz then v_result := anydata_timestamp_tz( );
-            when p_type_code = dbms_types.typecode_timestamp_ltz then v_result := anydata_timestamp_ltz( );
-            when p_type_code = dbms_types.typecode_interval_ym then v_result := anydata_interval_ym( );
-            when p_type_code = dbms_types.typecode_interval_ds then v_result := anydata_interval_ds( );
-            when p_type_code = dbms_types.typecode_nchar then v_result := anydata_nchar( );
-            when p_type_code = dbms_types.typecode_nvarchar2 then v_result := anydata_nvarchar2( );
-            when p_type_code = dbms_types.typecode_nclob then v_result := anydata_nclob( );
-            when p_type_code = dbms_types.typecode_bfloat then v_result := anydata_bfloat( );
-            when p_type_code = dbms_types.typecode_bdouble then v_result := anydata_bdouble( );
-            when p_type_code = dbms_types.typecode_object then v_result := anydata_object( );
-            when p_type_code = dbms_types.typecode_varray then v_result := anydata_collection( );
-            when p_type_code = dbms_types.typecode_table then v_result := anydata_collection( );
-            when p_type_code = dbms_types.typecode_namedcollection then v_result := anydata_collection( );
+            when p_type_code = dbms_types.typecode_number
+            then v_result := anydata_base(
+               'Number',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder )
+            );
+            when p_type_code = dbms_types.typecode_date
+            then v_result := anydata_base(
+               'Date',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder, 'YYYY-MM-DD HH24:MI:SS' ));
+            when p_type_code = dbms_types.typecode_timestamp
+            then v_result := anydata_base(
+               'Timestamp',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder,
+                                       'YYYY-MM-DD HH24:MI:SSxFF TZH:TZM')
+            );
+            when p_type_code = dbms_types.typecode_timestamp_tz
+            then v_result := anydata_base(
+               'TimestampTZ',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder,
+                                       'YYYY-MM-DD HH24:MI:SSxFF TZH:TZM')
+            );
+            when p_type_code = dbms_types.typecode_timestamp_ltz
+            then v_result := anydata_base(
+               'TimestampLTZ',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder,
+                                       'YYYY-MM-DD HH24:MI:SSxFF TZH:TZM')
+            );
+            when p_type_code = dbms_types.typecode_interval_ym
+            then v_result := anydata_base(
+               'IntervalYM',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder )
+            );
+            when p_type_code = dbms_types.typecode_interval_ds
+            then v_result := anydata_base(
+               'IntervalDS',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder )
+            );
+            when p_type_code = dbms_types.typecode_char
+            then v_result := anydata_char( 'Char' );
+            when p_type_code = dbms_types.typecode_varchar2
+            then v_result := anydata_char( 'Varchar2' );
+            when p_type_code = dbms_types.typecode_varchar
+            then v_result := anydata_char( 'Varchar' );
+            when p_type_code = dbms_types.typecode_nchar
+            then v_result := anydata_char( 'Nchar' );
+            when p_type_code = dbms_types.typecode_nvarchar2
+            then v_result := anydata_char( 'NVarchar2' );
+            when p_type_code = dbms_types.typecode_raw
+            then v_result := anydata_base(
+               'Raw',
+               anydata_helper.to_char(
+                  anydata_helper.utl_raw_cast_to_varchar2(
+                     anydata_helper.to_sting_placeholder
+                  )
+               )
+            );
+            when p_type_code = dbms_types.typecode_blob
+            then v_result := anydata_base(
+               'Blob',
+               anydata_helper.utl_raw_cast_to_varchar2(
+                  anydata_helper.dbms_lob_substr(
+                     anydata_helper.to_sting_placeholder,
+                     anydata_helper.max_return_data_length )
+               )
+            );
+            when p_type_code = dbms_types.typecode_bfile
+            then v_result := anydata_base(
+               'Bfile',
+               anydata_helper.utl_raw_cast_to_varchar2(
+                  anydata_helper.dbms_lob_substr(
+                     anydata_helper.to_sting_placeholder,
+                     anydata_helper.max_return_data_length )
+               )
+            );
+            when p_type_code = dbms_types.typecode_clob
+            then v_result := anydata_base(
+               'Clob',
+               anydata_helper.to_char(
+                  anydata_helper.dbms_lob_substr(
+                     anydata_helper.to_sting_placeholder,
+                     anydata_helper.max_return_data_length
+                  )
+               )
+            );
+            when p_type_code = dbms_types.typecode_cfile
+            then v_result := anydata_base(
+               'Cfile',
+               anydata_helper.dbms_lob_substr(
+                  anydata_helper.to_sting_placeholder,
+                  anydata_helper.max_return_data_length )
+            );
+            when p_type_code = dbms_types.typecode_nclob
+            then v_result := anydata_base(
+               'NClob',
+               anydata_helper.to_char(
+                  anydata_helper.dbms_lob_substr(
+                     anydata_helper.to_sting_placeholder,
+                     anydata_helper.max_return_data_length
+                  )
+               )
+            );
+            when p_type_code = dbms_types.typecode_bfloat
+            then v_result := anydata_base(
+               'BFloat',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder )
+
+            );
+            when p_type_code = dbms_types.typecode_bdouble
+            then v_result := anydata_base(
+               'BDouble',
+               anydata_helper.to_char( anydata_helper.to_sting_placeholder )
+
+            );
+            when p_type_code = dbms_types.typecode_object
+            then v_result := anydata_object( );
+            when p_type_code in ( dbms_types.typecode_varray, dbms_types.typecode_table, dbms_types.typecode_namedcollection )
+            then v_result := anydata_collection( );
          end case;
          v_result.type_info := anytype_info( p_type_code );
          return v_result;
@@ -171,5 +265,10 @@ final static function construct( p_field_name varchar2, p_field_value anydata ) 
          v_anydata.initialize_with_data( p_field_name, p_field_value );
          return v_anydata;
       end;
+constructor function anydata_base( p_function_suffix varchar2, p_string_data_getter varchar2 ) return self as result is
+   begin
+      initialize( p_function_suffix, p_string_data_getter);
+      return;
+   end;
 end;
 /

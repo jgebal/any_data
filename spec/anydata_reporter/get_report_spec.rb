@@ -72,7 +72,7 @@ describe 'get report from any data' do
     after(:all) do
       plsql.execute "DROP TYPE test_report_object FORCE"
       plsql.execute "DROP TYPE test_parent_object FORCE"
-      plsql.execute "DROP TYPE test_report_object FORCE"
+      plsql.execute "DROP TYPE test_child_object FORCE"
     end
 
     it 'reports an object type' do
