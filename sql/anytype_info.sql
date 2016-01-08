@@ -4,24 +4,23 @@ drop type anytype_info force;
 create type anytype_info as object (
    attribute_name     varchar2(400),
    attribute_type     anytype,
-   prec               integer,
-   scale              integer,
-   len                integer,
-   csid               integer,
-   csfrm              integer,
+   prec               number,
+   scale              number,
+   len                number,
+   csid               number,
+   csfrm              number,
    schema_name        varchar2(400),
    type_name          varchar2(400),
    build_in_type_name varchar2(400),
    version            varchar2(400),
-   type_code          integer,
-   count              integer,
+   type_code          number,
+   count              number,
 constructor function anytype_info ( pv_value anydata ) return self as result,
 constructor function anytype_info ( pv_child_position pls_integer, pv_parent_type anytype ) return self as result,
 constructor function anytype_info ( pv_type_code integer ) return self as result,
 member procedure update_from_attribute_type( self in out nocopy anytype_info ),
-member function get_report return varchar2,
 member function get_type return varchar2,
-member function get_type_name return varchar2,
+member function get_typename return varchar2,
 member function to_string return varchar2,
 static function get_build_in_typename( p_typecode integer ) return varchar2
 );
@@ -32,7 +31,6 @@ create or replace type body anytype_info is
    constructor function anytype_info ( pv_value anydata ) return self as result is
       begin
          self.type_code := pv_value.gettype( self.attribute_type );
-         --self.build_in_type_name := pv_value.gettypename();
          self.build_in_type_name := anytype_info.get_build_in_typename( self.type_code );
          update_from_attribute_type( );
          return;
@@ -82,7 +80,7 @@ member procedure update_from_attribute_type( self in out nocopy anytype_info ) i
          end if;
       end;
 
-member function get_type_name
+member function get_typename
       return varchar2 is
       begin
          return
@@ -95,16 +93,10 @@ member function get_type_name
          end;
       end;
 
-member function get_report
-      return varchar2 is
-      begin
-         return attribute_name || '(' || get_type( ) || ')';
-      end;
-
 member function get_type
       return varchar2 is
       begin
-         return get_type_name( )
+         return get_typename( )
                 || case
                    when prec is not null and not ( prec = 0 and NVL( scale, 0 ) = -127 )
                       then

@@ -5,6 +5,7 @@ require_relative 'support/execute_sqlplus_file'
   '../../../sql/anydata_helper.pks',
   '../../../sql/anydata_helper.pkb',
   '../../../sql/anydata_helpers/anydata_base.sql',
+  '../../../sql/anydata_helpers/anydata_compound.sql',
   '../../../sql/anydata_helpers/anydata_number.sql',
   '../../../sql/anydata_helpers/anydata_char.sql',
   '../../../sql/anydata_helpers/anydata_timestamp.sql',

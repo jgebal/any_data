@@ -2,10 +2,10 @@ drop type anydata_char force;
 /
 
 create or replace type anydata_char under anydata_base (
-member procedure initialize( p_function_suffix varchar2 ),
-overriding member function get_type_string return varchar2,
 constructor function anydata_char return self as result,
-overriding member function get_report return varchar2
+member procedure initialize( p_function_suffix varchar2 ),
+overriding member function get_type_def return varchar2,
+overriding member function get_value_as_string return varchar2
 ) not final;
 /
 
@@ -32,15 +32,20 @@ member procedure initialize( p_function_suffix varchar2 ) is
          );
       end;
 
-overriding member function get_type_string return varchar2 is
+overriding member function get_type_def return varchar2 is
+      v_parent_type varchar2(120) := ( self as anydata_base ).get_type_def( );
       begin
-         return self.get_type_name( )
-                || case when self.get_type_name( ) not like '%(%)%' then '(32767)' end;
+         return
+         case
+         when v_parent_type not like '%(%)%'
+            then v_parent_type || '(32767)'
+         else v_parent_type
+         end;
       end;
 
-overriding member function get_report return varchar2 is
+overriding member function get_value_as_string return varchar2 is
       begin
-         return self.element_name || '(' || self.get_type_name( ) || ')' || ' => "' || self.get_value_as_string( ) || '"';
+         return '''' || ( self as anydata_base ).get_value_as_string( ) || '''';
       end;
 
 end;

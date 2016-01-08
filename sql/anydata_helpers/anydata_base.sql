@@ -4,65 +4,93 @@ drop type anydata_base force;
 create or replace type anydata_base as object (
    element_name         varchar2(400),
    element_raw_data     anydata,
-   element_anytype_info anytype_info,
+   type_info            anytype_info,
    anydata_getter       varchar2(400),
    anydata_converter    varchar2(400),
    string_data_getter   varchar2(4000),
-member procedure initialize( p_function_suffix varchar2, p_string_data_getter varchar2 ),
-member procedure initialize_with_data( p_element_name varchar2, p_element_raw_data anydata ),
-member procedure initialize_with_data( p_element_raw_data anydata, p_element_type_info anytype_info ),
-member function get_type_name return varchar2,
-not final member function get_type_string return varchar2,
-member function get_data_getter_sql return varchar2,
-member function get_sql_for_piecewise_string return varchar2,
-not final member function get_sql_for_value_string return varchar2,
-not final member function get_value_as_string return varchar2,
-not final member function get_report return varchar2,
-member function get_child_type_info( pv_child_position pls_integer ) return anytype_info,
-static function construct( p_type_code integer ) return anydata_base,
-static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base
+member function get_sql_for_value_string return varchar2,
+member function get_value_as_string return varchar2,
+member function get_report return varchar2,
+member function get_type_def return varchar2,
+final member function get_type return varchar2,
+final member function get_typename return varchar2,
+final member procedure initialize( p_function_suffix varchar2, p_string_data_getter varchar2 ),
+final member procedure initialize_with_data( p_element_name varchar2, p_element_raw_data anydata ),
+final member procedure initialize_with_data( p_element_raw_data anydata, p_element_type_info anytype_info ),
+final member function get_data_getter_sql return varchar2,
+final member function get_sql_for_piecewise_string return varchar2,
+final member function get_child_type_info( pv_child_position pls_integer ) return anytype_info,
+final member procedure set_datatype_length( p_length integer),
+final static function construct( p_type_code integer ) return anydata_base,
+final static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base
 ) not final not instantiable;
 /
 
 create or replace type body anydata_base as
 
-member procedure initialize( p_function_suffix varchar2, p_string_data_getter varchar2 ) is
+member function get_sql_for_value_string return varchar2 is
+      begin
+         return '
+            declare
+               v_anydata_base      anydata_base := :p_in_data;
+               v_anydata           anydata := v_anydata_base.element_raw_data;
+               v_data ' || get_type_def( ) || ';
+            begin
+               ' || get_data_getter_sql( ) || '
+               :p_result := ' || replace( string_data_getter, anydata_helper.to_sting_placeholder, 'v_data' ) || ';
+            end;';
+      end;
+
+member function get_value_as_string
+      return varchar2 is
+      v_result varchar2(32767);
+      begin
+         execute immediate get_sql_for_value_string( ) using self, out v_result;
+         return v_result;
+      end;
+
+member function get_report return varchar2 is
+      begin
+         return element_name || '(' || get_type( ) || ')' || ' => ' || get_value_as_string( );
+      end;
+
+member function get_type_def return varchar2 is
+      begin
+         return get_type( );
+      end;
+
+final member function get_type return varchar2 is
+      begin
+         return type_info.get_type( );
+      end;
+
+final member function get_typename return varchar2 is
+      begin
+         return type_info.get_typename( );
+      end;
+
+final member procedure initialize( p_function_suffix varchar2, p_string_data_getter varchar2 ) is
       begin
          self.anydata_getter := 'get' || p_function_suffix;
          self.anydata_converter := 'convert' || p_function_suffix;
          self.string_data_getter := p_string_data_getter;
       end;
 
-member procedure initialize_with_data( p_element_name varchar2, p_element_raw_data anydata ) is
+final member procedure initialize_with_data( p_element_name varchar2, p_element_raw_data anydata ) is
       begin
-         self.element_name := UPPER( p_element_name );
+         self.element_name := p_element_name;
          self.element_raw_data := p_element_raw_data;
-         self.element_anytype_info := anytype_info( p_element_raw_data );
+         self.type_info := anytype_info( p_element_raw_data );
       end;
 
-member procedure initialize_with_data( p_element_raw_data anydata, p_element_type_info anytype_info ) is
+final member procedure initialize_with_data( p_element_raw_data anydata, p_element_type_info anytype_info ) is
       begin
          self.element_raw_data := p_element_raw_data;
-         self.element_anytype_info := p_element_type_info;
-         self.element_name := self.element_anytype_info.attribute_name;
+         self.type_info := p_element_type_info;
+         self.element_name := self.type_info.attribute_name;
       end;
 
-member function get_type_name return varchar2 is
-      begin
-         return
-         case
-         when element_anytype_info is null
-            then 'NULL element_anytype_info'
-         else element_anytype_info.get_type( )
-         end;
-      end;
-
-not final member function get_type_string return varchar2 is
-      begin
-         return get_type_name( );
-      end;
-
-member function get_data_getter_sql return varchar2 is
+final member function get_data_getter_sql return varchar2 is
       begin
          return 'if v_anydata.' || self.anydata_getter || '( v_data ) = DBMS_TYPES.NO_DATA then
                      raise NO_DATA_FOUND;
@@ -70,11 +98,11 @@ member function get_data_getter_sql return varchar2 is
 
       end;
 
-member function get_sql_for_piecewise_string return varchar2 is
+final member function get_sql_for_piecewise_string return varchar2 is
       begin
          return '
                declare
-                  v_data ' || get_type_string( ) || ';
+                  v_data ' || get_type_def( ) || ';
                   v_attribute_anydata anydata_base := anydata_base.construct(' || anydata_helper.typecode_placeholder || ');
                begin
                   ' || get_data_getter_sql( ) || '
@@ -86,48 +114,23 @@ member function get_sql_for_piecewise_string return varchar2 is
                end;';
       end;
 
-not final member function get_sql_for_value_string return varchar2 is
-      begin
-         return '
-            declare
-               v_anydata_base      anydata_base := :p_in_data;
-               v_anydata           anydata := v_anydata_base.element_raw_data;
-               v_data ' || get_type_string( ) || ';
-            begin
-               ' || get_data_getter_sql( ) || '
-               :p_result := ' || replace( string_data_getter, anydata_helper.to_sting_placeholder, 'v_data' ) || ';
-            end;';
-      end;
-
-not final member function get_value_as_string
-      return varchar2 is
-      v_result varchar2(32767);
-      begin
-         execute immediate get_sql_for_value_string( ) using self, out v_result;
-         return v_result;
-      end;
-
-not final member function get_report return varchar2 is
-      begin
-         return element_name
-                || '(' || get_type_name( ) || ')'
-                || ' => '
-                || get_value_as_string( );
-      end;
-
-member function get_child_type_info( pv_child_position pls_integer )
+final member function get_child_type_info( pv_child_position pls_integer )
       return anytype_info is
       begin
-         return anytype_info( pv_child_position, self.element_anytype_info.attribute_type );
+         return anytype_info( pv_child_position, self.type_info.attribute_type );
          exception when others then
          raise_Application_error(
             -20000,
             'pv_child_position=' || pv_child_position
-            || 'self.element_anytype_info.type_name=' || self.element_anytype_info.type_name
+            || 'self.type_info.type_name=' || self.type_info.type_name
          );
       end;
 
-static function construct( p_type_code integer ) return anydata_base is
+final member procedure set_datatype_length( p_length integer) is
+      begin
+         type_info.len := p_length;
+      end;
+final static function construct( p_type_code integer ) return anydata_base is
       v_result anydata_base;
       begin
          case
@@ -156,11 +159,11 @@ static function construct( p_type_code integer ) return anydata_base is
             when p_type_code = dbms_types.typecode_table then v_result := anydata_collection( );
             when p_type_code = dbms_types.typecode_namedcollection then v_result := anydata_collection( );
          end case;
-         v_result.element_anytype_info := anytype_info( p_type_code );
+         v_result.type_info := anytype_info( p_type_code );
          return v_result;
       end;
 
-static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base is
+final static function construct( p_field_name varchar2, p_field_value anydata ) return anydata_base is
       v_type    anytype;
       v_anydata anydata_base;
       begin
