@@ -42,27 +42,27 @@ describe 'get report from any data' do
   context 'for user defined object type' do
 
     before(:all) do
+      plsql.execute 'create or replace type test_primitive_col as table of number(5,3)'
       plsql.execute <<-SQL
-      CREATE OR REPLACE TYPE test_report_object AS OBJECT (
-        a_date DATE,
-        a_char VARCHAR2(1000),
-        a_num1 NUMBER,
-        a_num2 NUMBER(3,2)
+      create or replace type test_col_object as object (
+        a_date date,
+        a_char varchar2(1000),
+        a_col  test_primitive_col,
+        a_num2 number(3,2)
+      );
+      SQL
+      plsql.execute <<-SQL
+      create or replace type test_report_object as object (
+        a_date date,
+        a_char varchar2(1000),
+        a_num1 number,
+        a_num2 number(3,2)
       );
       SQL
 
       plsql.execute <<-SQL
-      CREATE OR REPLACE TYPE test_child_object AS OBJECT (
-        a_date DATE,
-        a_char VARCHAR2(1000),
-        a_num1 NUMBER,
-        a_num2 NUMBER(3,2)
-      );
-      SQL
-
-      plsql.execute <<-SQL
-      CREATE OR REPLACE TYPE test_parent_object AS OBJECT (
-        some_id  NUMBER,
+      create or replace type test_parent_object as object (
+        some_id  number,
         child_obj test_report_object
       );
       SQL
@@ -70,9 +70,9 @@ describe 'get report from any data' do
     end
 
     after(:all) do
-      plsql.execute "DROP TYPE test_report_object FORCE"
-      plsql.execute "DROP TYPE test_parent_object FORCE"
-      plsql.execute "DROP TYPE test_child_object FORCE"
+      plsql.execute 'drop type test_parent_object force'
+      plsql.execute 'drop type test_report_object force'
+      plsql.execute 'drop type test_col_object force'
     end
 
     it 'reports an object type' do
@@ -100,24 +100,45 @@ describe 'get report from any data' do
 }"
       expect( exec_reporter 'pv_obj', "ANYDATA.ConvertObject( #{test_parent_object} )" ).to eq expected
     end
+
+    it 'reports on collection within an object' do
+      test_collection='test_primitive_col( 1, 2, 3.456, 7.8, 9 )'
+      test_col_object="test_col_object( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', #{test_collection}, 1.23 )"
+      expected = "pv_obj(GENERIC_UTIL.TEST_COL_OBJECT) => {
+  A_DATE(DATE) => 2015-11-21 20:01:01,
+  A_CHAR(VARCHAR2(1000)) => 'some characters',
+  A_COL(GENERIC_UTIL.TEST_PRIMITIVE_COL) => [
+    (NUMBER(5,3)) => 1,
+    (NUMBER(5,3)) => 2,
+    (NUMBER(5,3)) => 3.456,
+    (NUMBER(5,3)) => 7.8,
+    (NUMBER(5,3)) => 9
+  ],
+  A_NUM2(NUMBER(3,2)) => 1.23
+}"
+      expect( exec_reporter 'pv_obj', "ANYDATA.ConvertObject( #{test_col_object} )" ).to eq expected
+    end
+
   end
 
   context 'user defined collection types' do
 
     before(:all) do
-      plsql.execute 'CREATE OR REPLACE TYPE test_primitive_col AS TABLE OF NUMBER(5,3)'
-      plsql.execute 'CREATE OR REPLACE TYPE test_obj AS OBJECT( text VARCHAR2(100), id NUMBER(20,0) )'
-      plsql.execute 'CREATE OR REPLACE TYPE test_obj_col AS TABLE OF test_obj'
+      plsql.execute 'create or replace type test_primitive_col as table of number(5,3)'
+      plsql.execute 'create or replace type test_obj as object( text varchar2(100), id number(20,0) )'
+      plsql.execute 'create or replace type test_obj_col as table of test_obj'
+      plsql.execute 'create or replace type test_col_col as table of test_primitive_col'
     end
 
     after(:all) do
-      plsql.execute "DROP TYPE test_primitive_col FORCE"
-      plsql.execute "DROP TYPE test_obj_col FORCE"
-      plsql.execute "DROP TYPE test_obj FORCE"
+      plsql.execute 'drop type test_col_col force'
+      plsql.execute 'drop type test_obj_col force'
+      plsql.execute 'drop type test_obj force'
+      plsql.execute 'drop type test_primitive_col force'
     end
 
     it 'reports on collection of primitives' do
-      test_collection="test_primitive_col( 1, 2, 3.456, 7.8, 9 )"
+      test_collection='test_primitive_col( 1, 2, 3.456, 7.8, 9 )'
       expected = 'pv_col(GENERIC_UTIL.TEST_PRIMITIVE_COL) => [
   (NUMBER(5,3)) => 1,
   (NUMBER(5,3)) => 2,
@@ -143,12 +164,38 @@ describe 'get report from any data' do
   }
 ]"
       expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
-
     end
 
-  end
-
-  context 'collection of objects type' do
+    it 'reports on collection of collections' do
+      test_collection='test_col_col(test_primitive_col( 1, 2, 3.456, 7.8, 9 ), test_primitive_col( 4,5,6,7.89 ))'
+      expected = 'pv_col(GENERIC_UTIL.TEST_COL_COL) => [
+  (GENERIC_UTIL.TEST_PRIMITIVE_COL) => [
+    (NUMBER(5,3)) => 1,
+    (NUMBER(5,3)) => 2,
+    (NUMBER(5,3)) => 3.456,
+    (NUMBER(5,3)) => 7.8,
+    (NUMBER(5,3)) => 9
+  ],
+  (GENERIC_UTIL.TEST_PRIMITIVE_COL) => [
+    (NUMBER(5,3)) => 4,
+    (NUMBER(5,3)) => 5,
+    (NUMBER(5,3)) => 6,
+    (NUMBER(5,3)) => 7.89
+],
+'
+      test_collection='test_col_col(test_primitive_col( 1, 2, 3.456, 7.8, 9 ))'
+      expected = 'pv_col(GENERIC_UTIL.TEST_COL_COL) => [
+  (GENERIC_UTIL.TEST_PRIMITIVE_COL) => [
+    (NUMBER(5,3)) => 1,
+    (NUMBER(5,3)) => 2,
+    (NUMBER(5,3)) => 3.456,
+    (NUMBER(5,3)) => 7.8,
+    (NUMBER(5,3)) => 9
+  ]
+],
+'
+      expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
+    end
 
   end
 

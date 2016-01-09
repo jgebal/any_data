@@ -1,18 +1,8 @@
-drop type anydata_collection force;
-/
-
-create or replace type anydata_collection under anydata_compound (
-constructor function anydata_collection return self as result,
-overriding member function get_sql_for_value_string return varchar2,
-overriding member function get_report return varchar2
-);
-/
-
 create or replace type body anydata_collection as
 
    constructor function anydata_collection return self as result is
       begin
-         self.initialize( 'Object' );
+         self.initialize( 'Collection' );
          return;
       end;
 
@@ -40,6 +30,15 @@ overriding member function get_sql_for_value_string return varchar2 is
             end;';
          return v_sql;
       end;
+
+overriding member function get_value_as_string
+   return varchar2 is
+   v_result varchar2(32767);
+   begin
+--      return get_sql_for_value_string( );
+      execute immediate get_sql_for_value_string( ) using self, out v_result;
+      return v_result;
+   end;
 
 overriding member function get_report return varchar2 is
       begin

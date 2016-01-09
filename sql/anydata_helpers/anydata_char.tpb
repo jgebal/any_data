@@ -1,27 +1,11 @@
-drop type anydata_char force;
-/
-
-create or replace type anydata_char under anydata_base (
-constructor function anydata_char( p_function_suffix varchar2 ) return self as result,
-overriding member function get_type_def return varchar2,
-overriding member function get_value_as_string return varchar2
-) not final;
-/
-
 create or replace type body anydata_char as
 
    constructor function anydata_char( p_function_suffix varchar2 ) return self as result is
       begin
          self.initialize(
             p_function_suffix,
-            anydata_helper.substr(
             --need trim as anydata returns a char 32767 from any convert from CHAR datatype
-               anydata_helper.trim(
-                  anydata_helper.to_sting_placeholder
-               ),
-               1,
-               anydata_helper.max_return_data_length - 2
-            )
+            'substr(trim('||anydata_helper.value_var||'),1,'||(anydata_helper.max_return_data_length - 2)||')'
          );
          return;
       end;

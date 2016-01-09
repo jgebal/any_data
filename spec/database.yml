@@ -2,7 +2,7 @@
 # Specify also host and port if not using tnsnames.ora connection.
 default:
   username: generic_util
-  password: generic_util
+  password: <%= ENV['DEFAULT_PASSWORD'] %>
   database: xe
   # host: localhost
   # port: 1521
