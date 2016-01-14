@@ -15,7 +15,7 @@ final member procedure initialize( p_function_suffix varchar2, p_string_data_get
 final member procedure initialize_with_data( p_element_name varchar2, p_element_raw_data anydata ),
 final member procedure initialize_with_data( p_element_raw_data anydata, p_element_type_info anytype_info ),
 final member function get_data_getter_sql return varchar2,
-final member function get_sql_for_piecewise_string( p_typecode integer, p_child_position integer ) return varchar2,
+final member function construct_as_attribute_sql( p_typecode integer, p_child_position integer ) return varchar2,
 final member function get_child_type_info( p_child_position pls_integer ) return anytype_info,
 final member procedure set_datatype_length( p_length integer),
 final static function construct( p_type_code integer ) return anydata_base,

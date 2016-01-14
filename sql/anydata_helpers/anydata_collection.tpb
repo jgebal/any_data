@@ -6,38 +6,27 @@ create or replace type body anydata_collection as
          return;
       end;
 
-overriding member function get_sql_for_value_string return varchar2 is
-      v_sql varchar2(32767);
-      begin
-         v_sql := '
+overriding member function get_elements_sql return varchar2 is
+   begin
+      return '
             declare
                v_anydata_base      anydata_base := :p_in_data;
                v_anydata           anydata := v_anydata_base.element_raw_data;
-               v_result            varchar2(32767);
+               v_result            anydata_base_arr := anydata_base_arr();
                v_attribute_anydata anydata_base;
+               '||anydata_helper.value_var||' ' || self.get_type_def( ) || ';
+               i                   integer;
             begin
-               v_anydata.piecewise();
-               loop
-                  begin'
-                  || self.get_sql_for_attribute( 1 ) || '
-                  v_result := v_result || '','' || anydata_helper.new_line;
-                  exception
-                     when no_data_found then
-                        :p_result := rtrim( v_result, '','' || anydata_helper.new_line ) ;
-                        exit;
-                  end;
+               ' || self.get_data_getter_sql( ) || '
+               i := '||anydata_helper.value_var||'.first;
+               while i is not null loop'
+                  || self.get_sql_for_attribute( ) || '
+                  v_result.extend;
+                  v_result( v_result.last ) := v_attribute_anydata;
+                  i := '||anydata_helper.value_var||'.next(i);
                end loop;
+               :p_resput := v_result;
             end;';
-         return v_sql;
-      end;
-
-overriding member function get_value_as_string
-   return varchar2 is
-   v_result varchar2(32767);
-   begin
---      return get_sql_for_value_string( );
-      execute immediate get_sql_for_value_string( ) using self, out v_result;
-      return v_result;
    end;
 
 overriding member function get_report return varchar2 is

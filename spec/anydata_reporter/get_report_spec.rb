@@ -167,8 +167,8 @@ describe 'get report from any data' do
     (NUMBER(5,3)) => 5,
     (NUMBER(5,3)) => 6,
     (NUMBER(5,3)) => 7.89
-],
-'
+  ]
+]'
       expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
     end
 

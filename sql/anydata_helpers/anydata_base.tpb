@@ -70,20 +70,25 @@ final member function get_data_getter_sql return varchar2 is
 
       end;
 
-final member function get_sql_for_piecewise_string( p_typecode integer, p_child_position integer ) return varchar2 is
+final member function construct_as_attribute_sql( p_typecode integer, p_child_position integer ) return varchar2 is
       begin
-         return '
-               declare
-                  '||anydata_helper.value_var||' ' || get_type_def( ) || ';
-                  v_attribute_anydata anydata_base := anydata_base.construct(' || p_typecode || ');
-               begin
-                  ' || get_data_getter_sql( ) || '
-                  v_attribute_anydata.initialize_with_data(
-                     anydata.' || anydata_converter || '( '||anydata_helper.value_var||' ),
-                     v_anydata_base.get_child_type_info(' || p_child_position || ')
-                  );
-                  v_result := v_result || v_attribute_anydata.get_report();
-               end;';
+         return case when p_child_position is not null then '
+                  declare
+                     '||anydata_helper.value_var||' ' || get_type_def( ) || ';'
+                end ||'
+                  begin
+                     '
+                     || case when to_char(p_child_position) is not null then get_data_getter_sql() end
+                     || '
+                     v_attribute_anydata := anydata_base.construct(' || p_typecode || ');
+                     v_attribute_anydata.initialize_with_data(
+                        anydata.' || anydata_converter || '( '
+                           ||anydata_helper.value_var
+                           ||case when p_child_position is null then '(i)'end
+                        ||' ),
+                        v_anydata_base.get_child_type_info(' || coalesce( to_char(p_child_position),'i' ) || ')
+                     );
+                  end;';
       end;
 
 final member function get_child_type_info( p_child_position pls_integer )
