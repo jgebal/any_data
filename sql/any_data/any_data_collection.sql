@@ -1,49 +1,13 @@
 drop type any_data_collection force;
 /
 
-create or replace type any_data_collection under any_data(
-   data_values     any_data_tab,
-   member procedure add_element( self in out nocopy any_data_collection, p_element any_data ),
-   member function get_element( p_position integer ) return any_data,
-   member function get_elements_count return integer,
-   overriding member function to_string return varchar2,
+create or replace type any_data_collection under any_data_compound(
    overriding member procedure initialise( self in out nocopy any_data_collection, p_data anydata ),
    constructor function any_data_collection( p_type_code integer ) return self as result
 );
 /
 
 create or replace type body any_data_collection as
-
-   member function get_elements_count return integer is
-      begin
-        return coalesce( cardinality( data_values ), 0 );
-      end;
-
-   member function get_element( p_position integer ) return any_data is
-      begin
-         return data_values( p_position );
-      end;
-
-   member procedure add_element( self in out nocopy any_data_collection, p_element any_data ) is
-      begin
-         data_values.extend;
-         data_values( data_values.last ) := p_element;
-      end;
-
-   overriding member function to_string return varchar2 is
-      v_result varchar2(32767);
-      values_count  integer := get_elements_count();
-      begin
-         v_result := self.type_info.get_type_name() || '(' || anydata_helper.new_line;
-         for i in 1 .. values_count loop
-            v_result := v_result ||
-                        anydata_helper.indent_lines(
-                           data_values(i).to_string() || case when i < values_count then ',' end
-                        ) || anydata_helper.new_line;
-         end loop;
-
-         return v_result || ')';
-      end;
 
    overriding member procedure initialise( self in out nocopy any_data_collection, p_data anydata ) is
       v_sql       varchar2(32767);
@@ -55,7 +19,7 @@ create or replace type body any_data_collection as
 
          v_template := v_builder.get_element(1);
 
-         self.type_info.set_type_name( v_builder.type_info.get_type() );
+         self.type_info.set_type_name( v_builder.type_helper.get_type() );
 
          v_tmp_obj := self;
 
@@ -64,7 +28,7 @@ create or replace type body any_data_collection as
                v_data          anydata             := :p_data;
                v_template      any_data            := :p_template;
                v_obj           any_data_collection := :p_obj;
-               v_collection    ' || v_builder.type_info.get_type() || ';
+               v_collection    ' || v_builder.type_helper.get_type() || ';
                i               integer;
             begin
                if v_data.getCollection( v_collection ) = DBMS_TYPES.NO_DATA then
@@ -72,7 +36,7 @@ create or replace type body any_data_collection as
                end if;
                i := v_collection.first;
                while i is not null loop
-                  v_template.initialise( anydata.'||v_template.type_info.converter_func_name()||'( v_collection(i) ) );
+                  v_template.initialise( anydata.'||v_template.get_type().converter_func_name()||'( v_collection(i) ) );
                   v_obj.add_element( v_template );
                   i := v_collection.next(i);
                end loop;

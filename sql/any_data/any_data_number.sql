@@ -5,7 +5,8 @@ create or replace type any_data_number under any_data(
    data_value number,
    overriding member function to_string return varchar2,
    overriding member procedure initialise( self in out nocopy any_data_number, p_data anydata ),
-   constructor function any_data_number return self as result
+   constructor function any_data_number return self as result,
+   constructor function any_data_number( p_data number ) return self as result
 );
 /
 
@@ -26,6 +27,13 @@ create or replace type body any_data_number as
    constructor function any_data_number return self as result is
       begin
          self.type_info := any_type( dbms_types.typecode_number, 'NUMBER' );
+         return;
+      end;
+
+   constructor function any_data_number( p_data number ) return self as result is
+      begin
+         self.type_info := any_type( dbms_types.typecode_number, 'NUMBER' );
+         data_value := p_data;
          return;
       end;
 

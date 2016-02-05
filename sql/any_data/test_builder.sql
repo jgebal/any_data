@@ -1,3 +1,46 @@
+declare
+   v_input  anydata := anydata.convertNumber(1);
+   v_result any_data_number;
+   v_data   number;
+begin
+   if v_input.getNumber( v_data ) = DBMS_TYPES.NO_DATA then
+      raise NO_DATA_FOUND;
+   end if;
+   v_result := any_data_number();
+   v_result.data_value := v_data;
+   dbms_output.put_line(v_result.to_string());
+end;
+/
+
+
+declare
+   v_input  anydata := anydata.convertObject( test_number_object(1,2) );
+   v_result any_data_object;
+   v_data   test_number_object;
+begin
+   if v_input.getObject( v_data ) = DBMS_TYPES.NO_DATA then
+      raise NO_DATA_FOUND;
+   end if;
+   v_result := any_data_object( 'GENERIC_UTIL.TEST_NUMBER_OBJECT' );
+   v_result.add_element( any_data_attribute( 'A_NUMBER', any_data_number( v_data.a_number ) ) );
+   v_result.add_element( any_data_attribute( 'B_NUMBER', any_data_number( v_data.b_number ) ) );
+   dbms_output.put_line( v_result.to_string() );
+end;
+/
+
+declare
+   x number := 1;
+   a anydata;
+   d any_data;
+begin
+   a := anydata.convertNumber(x);
+   d := ANY_DATA_BUILDER(a).get_any_data();
+   dbms_output.put_line( d.to_string() );
+end;
+/
+
+
+
 drop type test_number_object force;
 drop type test_object force;
 drop type test_object_2 force;
@@ -20,6 +63,7 @@ create type test_object_2 as object(
 /
 create or replace type a_tab as table of test_object_2;
 /
+
 
 declare
    z test_object_2;

@@ -13,8 +13,8 @@ create or replace type any_type as object (
    member procedure set_type_info( self in out nocopy any_type, p_type_name varchar2, p_type_def varchar2 ),
    member function getter_func_name return varchar2,
    member function converter_func_name return varchar2,
-   constructor function any_type( p_type_code number, p_type_name varchar2) return self as result,
-   constructor function any_type( p_type_code number, p_type_name varchar2, p_fnc_suffix varchar2) return self as result
+   constructor function any_type( p_type_code number, p_type_name varchar2 ) return self as result,
+   constructor function any_type( p_type_code number, p_type_name varchar2, p_fnc_suffix varchar2 ) return self as result
 );
 /
 
