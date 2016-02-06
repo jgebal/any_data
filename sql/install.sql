@@ -14,6 +14,11 @@
 @@core/any_data_collection.sql
 
 @@core/any_data_number.sql
+@@core/any_data_varchar2.sql
+@@core/any_data_char.sql
+@@core/any_data_date.sql
+@@core/any_data_bdouble.sql
+@@core/any_data_bfloat.sql
 
 
 @@converter/any_type_mapper.sql

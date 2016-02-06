@@ -37,7 +37,13 @@ create or replace type body any_type_mapper is
          self.type_code := p_value.gettype( self.attribute_type );
          self.build_in_type_name := get_build_in_typename();
          update_from_attribute_type( );
-         return;
+         if type_code in ( dbms_types.typecode_varchar2, dbms_types.typecode_char,
+                           dbms_types.typecode_varchar, dbms_types.typecode_raw,
+                           dbms_types.typecode_nvarchar2, dbms_types.typecode_nchar)
+         and len is null then
+            len := 32767;
+         end if;
+                           return;
       end;
 
    constructor function any_type_mapper ( p_child_position pls_integer, p_parent_type anytype ) return self as result is

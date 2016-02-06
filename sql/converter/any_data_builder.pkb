@@ -1,12 +1,12 @@
 create or replace package body any_data_builder as
 
-   c_type_name constant varchar2(30) := '{type_name}';
-   c_declare   constant varchar2(30) := '{declare}';
-   c_code      constant varchar2(30) := '{code}';
-   c_getter    constant varchar2(30) := '{getter}';
-   c_return    constant varchar2(30) := '{return}';
-   c_value     constant varchar2(30) := '{value}';
-   c_data      constant varchar2(30) := 'v_data';
+   c_type_def constant varchar2(30) := '{type_name}';
+   c_declare  constant varchar2(30) := '{declare}';
+   c_code     constant varchar2(30) := '{code}';
+   c_getter   constant varchar2(30) := '{getter}';
+   c_return   constant varchar2(30) := '{return}';
+   c_value    constant varchar2(30) := '{value}';
+   c_data     constant varchar2(30) := 'v_data';
 
    c_sql_block constant varchar2(1000) :=
       'declare'||any_data_formatter.new_line||
@@ -18,7 +18,7 @@ create or replace package body any_data_builder as
    c_outer_sql_block constant varchar2(1000) :=
       'declare'||any_data_formatter.new_line||
       '   v_input anydata := :p_input;'||any_data_formatter.new_line||
-      '   '||c_data||' '||c_type_name||';'||any_data_formatter.new_line||
+      '   '||c_data||' ' || c_type_def || ';' || any_data_formatter.new_line ||
       'begin'||any_data_formatter.new_line||
       '   if v_input.get'||c_getter||'( '||c_data||' ) = DBMS_TYPES.NO_DATA then'||any_data_formatter.new_line||
       '      raise NO_DATA_FOUND;'||any_data_formatter.new_line||
@@ -45,13 +45,12 @@ create or replace package body any_data_builder as
          if p_type.type_code in ( dbms_types.typecode_table, dbms_types.typecode_varray, dbms_types.typecode_namedcollection ) then
             v_declare_sql :=
                v_out||' '||p_type.get_any_data_object_name()||' := '||p_type.get_any_data_object_name()||'('''||p_type.get_typename()||''', '||p_type.type_code||');'||any_data_formatter.new_line||
-               v_iter||' integer := '||p_data_breadcrumb||'.first;'
+               v_iter||' integer := '||v_data_breadcrumb||'.first;'
             ;
-            v_data_breadcrumb := v_data_breadcrumb||'('||v_iter||')';
             v_code_sql :=
                'while '||v_iter||' is not null loop'||any_data_formatter.new_line||
-               build_sql( p_type.get_attribute_type( 1 ), v_data_breadcrumb, p_level + 1, v_out||'.add_element('||c_value||');' )||any_data_formatter.new_line||
-               v_iter||' := '||p_data_breadcrumb||'.next('||v_iter||');'||any_data_formatter.new_line||
+               build_sql( p_type.get_attribute_type( 1 ), v_data_breadcrumb||'('||v_iter||')', p_level + 1, v_out||'.add_element('||c_value||');' )||any_data_formatter.new_line||
+               v_iter||' := '||v_data_breadcrumb||'.next('||v_iter||');'||any_data_formatter.new_line||
                'end loop;'||any_data_formatter.new_line;
          elsif p_type.type_code = dbms_types.typecode_object then
             v_declare_sql := v_out || ' ' ||p_type.get_any_data_object_name()||' := '||p_type.get_any_data_object_name() || '(''' || p_type.get_typename() || ''');';
@@ -83,7 +82,7 @@ create or replace package body any_data_builder as
    function get_conversion_sql( p_type any_type_mapper ) return varchar2 is
       v_sql varchar2(32767) := c_outer_sql_block;
       begin
-         v_sql := replace( v_sql, c_type_name, p_type.get_typename( ) );
+         v_sql := replace( v_sql, c_type_def, p_type.get_type( ) );
          v_sql := replace( v_sql, c_getter, p_type.get_anydata_getter( ) );
          v_sql := replace( v_sql, c_code, build_sql( p_type, c_data ) );
          return v_sql;
