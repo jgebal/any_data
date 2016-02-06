@@ -2,10 +2,10 @@ require 'anydata_reporter'
 
 describe 'get report from any data' do
 
-  def exec_reporter(param_name, anydata_call)
+  def exec_reporter(anydata)
     sql =  <<-SQL
       BEGIN
-        :x := anydata_reporter.get_report( '#{param_name}', #{anydata_call});
+        :x := any_data_builder.build( #{anydata} ).to_string();
       END;
     SQL
     cursor = plsql.connection.parse(sql).bind_param(":x", nil, :data_type => 'VARCHAR2', :in_out => 'OUT')
@@ -53,25 +53,25 @@ describe 'get report from any data' do
   context 'for build-in Oracle types' do
 
     it 'reports a NUMBER datatype' do
-      result = exec_reporter 'numeric_var', 'ANYDATA.ConvertNumber( 3 )'
-      expect( result ).to eq 'numeric_var(NUMBER) => 3'
+      result = exec_reporter 'ANYDATA.ConvertNumber( 3 )'
+      expect( result ).to eq '3'
     end
 
     it 'reports a VARCHAR2 datatype' do
-      result = exec_reporter 'v_varchar2', "ANYDATA.ConvertVarchar2( 'Sample varchar' )"
+      result = exec_reporter "ANYDATA.ConvertVarchar2( 'Sample varchar' )"
       expect( result ).to eq "v_varchar2(VARCHAR2) => 'Sample varchar'"
     end
 
     [
-      {type: 'DATE', in_name: 'MY_VARIABLE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: 'MY_VARIABLE(DATE) => 2015-11-21 20:01:01'},
-      {type: 'BINARY_DOUBLE', in_name: 'MY_VARIABLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: 'MY_VARIABLE(BINARY_DOUBLE) => 1.23456789E+002'},
-      {type: 'BINARY_FLOAT', in_name: 'SOME_VARIABLE', in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: 'SOME_VARIABLE(BINARY_FLOAT) => 1.23456001E+002'},
-      {type: 'BLOB',in_name: 'MY_VARIABLE',   in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: 'MY_VARIABLE(BLOB) => 1234%$#$%DRGSDFG$#%'},
-      {type: 'CHAR',in_name: 'SOME_VARIABLE', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "SOME_VARIABLE(CHAR) => 'A'"},
-      {type: 'CLOB',in_name: 'VAR', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'VAR(CLOB) => clob value'},
+      {type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: 'MY_VARIABLE(DATE) => 2015-11-21 20:01:01'},
+      {type: 'BINARY_DOUBLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: 'MY_VARIABLE(BINARY_DOUBLE) => 1.23456789E+002'},
+      {type: 'BINARY_FLOAT',  in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: 'SOME_VARIABLE(BINARY_FLOAT) => 1.23456001E+002'},
+      {type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: 'MY_VARIABLE(BLOB) => 1234%$#$%DRGSDFG$#%'},
+      {type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "SOME_VARIABLE(CHAR) => 'A'"},
+      {type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'VAR(CLOB) => clob value'},
     ].each do |test_case|
       it "reports a #{test_case[:type]} datatype" do
-        expect( exec_reporter test_case[:in_name], test_case[:in_val] ).to eq test_case[:expected]
+        expect( exec_reporter test_case[:in_val] ).to eq test_case[:expected]
       end
     end
   end
@@ -84,7 +84,7 @@ describe 'get report from any data' do
   TEXT(VARCHAR2(100)) => 'some characters',
   ID(NUMBER(22,11)) => 1234567890.12345678901
 }"
-      expect( exec_reporter 'pv_obj', "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
+      expect( exec_reporter "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
     end
 
     it 'reports on object within an object' do
@@ -97,7 +97,7 @@ describe 'get report from any data' do
     ID(NUMBER(22,11)) => 1234567890.12345678901
   }
 }"
-      expect( exec_reporter 'pv_obj', "ANYDATA.ConvertObject( #{test_parent_object} )" ).to eq expected
+      expect( exec_reporter "ANYDATA.ConvertObject( #{test_parent_object} )" ).to eq expected
     end
 
     it 'reports on collection within an object' do
@@ -115,7 +115,7 @@ describe 'get report from any data' do
   ],
   A_NUM2(NUMBER(3,2)) => 1.23
 }"
-      expect( exec_reporter 'pv_obj', "ANYDATA.ConvertObject( #{test_col_obj} )" ).to eq expected
+      expect( exec_reporter "ANYDATA.ConvertObject( #{test_col_obj} )" ).to eq expected
     end
 
   end
@@ -154,22 +154,22 @@ describe 'get report from any data' do
 
     it 'reports on collection of collections' do
       test_collection='test_col_col(test_col( 1, 2, 3.456, 7.8, 9 ), test_col( 4,5,6,7.89 ))'
-      expected = 'pv_col(GENERIC_UTIL.TEST_COL_COL) => [
-  (GENERIC_UTIL.TEST_COL) => [
-    (NUMBER(5,3)) => 1,
-    (NUMBER(5,3)) => 2,
-    (NUMBER(5,3)) => 3.456,
-    (NUMBER(5,3)) => 7.8,
-    (NUMBER(5,3)) => 9
-  ],
-  (GENERIC_UTIL.TEST_COL) => [
-    (NUMBER(5,3)) => 4,
-    (NUMBER(5,3)) => 5,
-    (NUMBER(5,3)) => 6,
-    (NUMBER(5,3)) => 7.89
-  ]
-]'
-      expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
+      expected = 'GENERIC_UTIL.TEST_COL_COL(
+   GENERIC_UTIL.TEST_COL(
+      1,
+      2,
+      3.456,
+      7.8,
+      9
+   ),
+   GENERIC_UTIL.TEST_COL(
+      4,
+      5,
+      6,
+      7.89
+   )
+)'
+      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
     end
 
     it 'reports on collection of objects with collections' do
@@ -196,7 +196,7 @@ describe 'get report from any data' do
     A_NUM2(NUMBER(3,2)) => 1.23
   }
 ]"
-      expect( exec_reporter 'pv_col', "ANYDATA.ConvertCollection( #{test_col_obj_col} )" ).to eq expected
+      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_col_obj_col} )" ).to eq expected
     end
 
   end

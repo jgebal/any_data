@@ -1,16 +1,23 @@
-drop package anydata_helper;
+drop package any_data_builder;
 /
-drop package anydata_reporter;
+drop type any_type_mapper;
 /
-drop type anydata_object force;
+
+drop type any_data_number;
 /
-drop type anydata_collection force;
+drop type any_data_object;
 /
-drop type anydata_compound force;
+drop type any_data_collection;
 /
-drop type anydata_char force;
+drop type any_data_compound;
 /
-drop type anydata_base_arr force;
+drop type any_data_tab;
 /
-drop type anydata_base force;
+drop type any_data_attribute;
+/
+drop type any_data;
+/
+drop type any_type;
+/
+drop package any_data_formatter;
 /

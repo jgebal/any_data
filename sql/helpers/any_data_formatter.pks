@@ -1,6 +1,5 @@
-create or replace package anydata_helper as
+create or replace package any_data_formatter as
 
-   value_var constant varchar2(30) := 'v_data';
    max_return_data_length constant integer := 100;
    new_line constant varchar2(2) := CHR( 10 );
    indent_amount constant pls_integer := 3;
