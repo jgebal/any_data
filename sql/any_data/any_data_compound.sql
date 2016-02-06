@@ -3,27 +3,27 @@ drop type any_data_compound force;
 
 create or replace type any_data_compound under any_data(
    data_values     any_data_tab,
-   member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ),
-   member function get_element( p_position integer ) return any_data,
-   member function get_elements_count return integer,
+   overriding member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ),
+   overriding member function get_element( p_position integer ) return any_data,
+   overriding member function get_elements_count return integer,
    overriding member function to_string return varchar2
 ) not final not instantiable;
 /
 
 create or replace type body any_data_compound as
 
-   member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ) is
+   overriding member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ) is
       begin
          data_values.extend;
          data_values( data_values.last ) := p_attribute;
       end;
 
-   member function get_element( p_position integer ) return any_data is
+   overriding member function get_element( p_position integer ) return any_data is
       begin
          return data_values( p_position );
       end;
 
-   member function get_elements_count return integer is
+   overriding member function get_elements_count return integer is
       begin
          return coalesce( cardinality( data_values ), 0 );
       end;
