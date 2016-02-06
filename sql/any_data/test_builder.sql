@@ -1,5 +1,7 @@
 declare
    v_input  anydata;
+   v_sql    varchar2(32767);
+   v_result any_data;
    procedure get_type_info( p_mapper any_type_mapper, p_level integer := 1) is
       begin
          dbms_output.put_line( lpad(' ',2*p_level)||p_mapper.attribute_name||' '||p_mapper.get_typename()||' '||p_mapper.attributes_count );
@@ -12,51 +14,71 @@ declare
          end if;
       end;
 
-   function get_sql_for_object( p_child_sql varchar2, p_type_name varchar2, p_level integer, p_return_assignment varchar2 ) return varchar2 is
+   function get_sql_for_object( p_child_sql varchar2, p_type_name varchar2, p_level integer, p_return_assignment varchar2, p_attribute_name varchar2 ) return varchar2 is
+        v_return_assignment varchar2(1000);
       begin
+         if p_attribute_name is not null then
+            v_return_assignment := 'any_data_attribute( '''||p_attribute_name||''', v_out_' || p_level ||')';
+         else
+            v_return_assignment := 'v_out_' || p_level;
+         end if;
          return 'declare
          v_out_'||p_level||' any_data := any_data_object( '''||p_type_name||''' );
       begin
-         '||p_child_sql||replace( p_return_assignment, '{value}', 'v_out_' || p_level )||'
+         '||p_child_sql||replace( p_return_assignment, '{value}', v_return_assignment )||'
       end;
          ';
       end;
-   function get_sql_for_scalar( p_return_assignment varchar2, p_any_data_type varchar2 ) return varchar2 is
+   function get_sql_for_scalar( p_return_assignment varchar2, p_any_data_type varchar2, p_attribute_name varchar2, p_data_breadcrumb varchar2 ) return varchar2 is
       begin
-         return replace( p_return_assignment, '{value}', 'any_data_'||p_any_data_type||'( v_data.a_value.val.a_number )' )||'
+         return replace( p_return_assignment,
+                         '{value}',
+                         'any_data_attribute( '''||p_attribute_name||''', any_data_'||p_any_data_type||'( '||p_data_breadcrumb||' ) )' )||'
          ';
       end;
 
-   function get_sql( p_mapper any_type_mapper, p_level integer := 1 ) return varchar2 is
+   function get_sql( p_mapper any_type_mapper, p_data_breadcrumb varchar2, p_level integer := 0, p_return_assignment varchar2 := ':p_out := {value};' ) return varchar2 is
       v_sql varchar2(32767);
-      v_return_assignment varchar2(1000);
+      v_return_assignment varchar2(1000) := p_return_assignment;
+      v_data_breadcrumb   varchar2(4000) := p_data_breadcrumb;
       begin
-         v_return_assignment :=
-         case when p_level = 1
-            then ':p_out := {value};'
-         when p_mapper.attribute_name is not null
-            then 'v_out_'||p_level||'.add_element( any_data_attribute( '''||p_mapper.attribute_name||''', {value} ) );'
-         else
-            'v_out_'||p_level||'.add_element( {value} );'
-         end;
+         if p_mapper.attribute_name is not null then
+            v_return_assignment := 'v_out_'||p_level||'.add_element( {value} );';
+            v_data_breadcrumb    :=  v_data_breadcrumb||'.'||p_mapper.attribute_name;
+--          else
+--             v_return_assignment := 'v_out_'||p_level||'.add_element( {value} );';
+         end if;
          if p_mapper.type_code = dbms_types.typecode_object then
             for i in 1 .. p_mapper.attributes_count loop
-               v_sql := v_sql || get_sql( p_mapper.get_attribute_type( i ), p_level + 1 );
+               v_sql := v_sql || get_sql( p_mapper.get_attribute_type( i ), v_data_breadcrumb, p_level + 1, v_return_assignment );
             end loop;
-            v_sql := get_sql_for_object( v_sql, p_mapper.get_typename(), p_level, v_return_assignment );
-         elsif p_mapper.type_code in ( dbms_types.typecode_table, dbms_types.typecode_varray, dbms_types.typecode_namedcollection ) then
-            v_sql := get_sql( p_mapper.get_attribute_type( 1 ), p_level );
+            v_sql := get_sql_for_object( v_sql, p_mapper.get_typename(), p_level+1, v_return_assignment, p_mapper.attribute_name );
+--            elsif p_mapper.type_code in ( dbms_types.typecode_table, dbms_types.typecode_varray, dbms_types.typecode_namedcollection ) then
+--               v_sql := get_sql( p_mapper.get_attribute_type( 1 ), p_level );
          else
-            v_sql := get_sql_for_scalar( v_return_assignment, p_mapper.get_typename() );
+            v_sql := get_sql_for_scalar( p_return_assignment, p_mapper.get_typename(), p_mapper.attribute_name, v_data_breadcrumb );
          end if;
          return v_sql;
       end;
 begin
-   --   v_input  := anydata.convertObject( test_object_2( test_object( test_number_object(1,2) ) ) );
+      v_input  := anydata.convertObject( test_object_2( test_object( test_number_object(1,2) ) ) );
    --   v_input  := anydata.convertCollection( a_tab( test_object_2( test_object( test_number_object(1,2) ) ) ) );
-   v_input  := anydata.convertCollection( a_tab( test_obj_2_bis( test_object( test_number_object(1,2) ) ,123 ) ) );
+--   v_input  := anydata.convertCollection( a_tab( test_obj_2_bis( test_object( test_number_object(1,2) ) ,123 ) ) );
 --   get_type_info( any_type_mapper(v_input) );
-   dbms_output.put_line( get_sql(any_type_mapper(v_input) ) );
+   v_sql := get_sql( any_type_mapper(v_input), 'v_data' );
+   v_sql := '
+   declare
+      v_input anydata := :p_input;
+      v_data  test_object_2;
+   begin
+      if v_input.getObject( v_data ) = DBMS_TYPES.NO_DATA then
+         raise NO_DATA_FOUND;
+      end if;
+      '||v_sql||'
+   end;';
+   dbms_output.put_line( v_sql );
+   execute immediate v_sql using in v_input, out v_result;
+   dbms_output.put_line( v_result.to_string() );
 end;
 /
 
@@ -123,6 +145,45 @@ begin
       end;
       v_out_1.add_element( any_data_attribute( 'A_VALUE', v_out_2 ) );
    end;
+   dbms_output.put_line( v_out_1.to_string() );
+end;
+/
+
+declare
+   v_input  anydata := anydata.convertObject( test_object_2( test_object( test_number_object(1,2) ) ) );
+   v_out_1  any_data := any_data_object( 'GENERIC_UTIL.TEST_OBJECT_2' );
+   v_data test_object_2;
+begin
+   if v_input.getObject( v_data ) = DBMS_TYPES.NO_DATA then
+      raise NO_DATA_FOUND;
+   end if;
+   --going throug internals of object 1
+   declare
+      v_out_2  any_data := any_data_object( 'GENERIC_UTIL.TEST_OBJECT' );  --
+   begin
+
+      --going through internals of object 2
+      declare
+         v_out_3  any_data := any_data_object( 'GENERIC_UTIL.TEST_NUMBER_OBJECT' );
+      begin
+
+         --going through internals of object 3
+         begin
+            v_out_3.add_element( any_data_attribute( 'A_NUMBER', any_data_number( v_data.a_value.val.a_number ) ) );  --scalar assignend to object 3 as element
+         end;
+         begin
+            v_out_3.add_element( any_data_attribute( 'B_NUMBER', any_data_number( v_data.a_value.val.b_number ) ) );  --scalar assignend to object 3 as element
+         end;
+         --end going through internals of object 3
+
+         v_out_2.add_element( any_data_attribute( 'VAL', v_out_3 ) );   --object 3 assignend to object 2 as element
+      end;
+      --end going through internals of object 2
+
+      v_out_1.add_element( any_data_attribute( 'A_VALUE', v_out_2 ) ); --object 2 assignend to object 1 as element
+   end;
+   --end going through internals of object 1
+
    dbms_output.put_line( v_out_1.to_string() );
 end;
 /
