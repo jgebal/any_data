@@ -17,6 +17,8 @@ require_relative 'support/execute_sqlplus_file'
   '../../../sql/core/any_data_date.sql',
   '../../../sql/core/any_data_bdouble.sql',
   '../../../sql/core/any_data_bfloat.sql',
+  '../../../sql/core/any_data_blob.sql',
+  '../../../sql/core/any_data_clob.sql',
   '../../../sql/converter/any_type_mapper.sql',
   '../../../sql/converter/any_data_builder.pks',
   '../../../sql/converter/any_data_builder.pkb',

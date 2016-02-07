@@ -2,6 +2,10 @@ drop package any_data_builder;
 /
 drop type any_type_mapper;
 /
+drop type any_data_clob;
+/
+drop type any_data_blob;
+/
 drop type any_data_bfloat;
 /
 drop type any_data_bdouble;

@@ -19,6 +19,8 @@
 @@core/any_data_date.sql
 @@core/any_data_bdouble.sql
 @@core/any_data_bfloat.sql
+@@core/any_data_blob.sql
+@@core/any_data_clob.sql
 
 
 @@converter/any_type_mapper.sql
