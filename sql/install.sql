@@ -15,12 +15,15 @@
 
 @@core/any_data_number.sql
 @@core/any_data_varchar2.sql
+@@core/any_data_varchar.sql
 @@core/any_data_char.sql
 @@core/any_data_date.sql
 @@core/any_data_bdouble.sql
 @@core/any_data_bfloat.sql
 @@core/any_data_blob.sql
 @@core/any_data_clob.sql
+@@core/any_data_intervalds.sql
+@@core/any_data_intervalym.sql
 
 
 @@converter/any_type_mapper.sql

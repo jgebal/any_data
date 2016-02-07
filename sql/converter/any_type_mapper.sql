@@ -1,4 +1,4 @@
-create type any_type_mapper as object (
+create or replace type any_type_mapper as object (
    attribute_name     varchar2(400),
    attribute_type     anytype,
    prec               number,
@@ -12,8 +12,8 @@ create type any_type_mapper as object (
    version            varchar2(400),
    type_code          number,
    attributes_count   number,
-   constructor function any_type_mapper ( p_value anydata ) return self as result,
-   constructor function any_type_mapper ( p_child_position pls_integer, p_parent_type anytype ) return self as result,
+   constructor function any_type_mapper ( self in out nocopy any_type_mapper, p_value anydata ) return self as result,
+   constructor function any_type_mapper (  self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result,
    member function get_type return varchar2,
    member function get_typename return varchar2,
    member function get_attribute_type( p_child_position pls_integer ) return any_type_mapper,
@@ -32,7 +32,7 @@ create or replace type body any_type_mapper is
          return any_type_mapper( p_child_position, self.attribute_type );
       end;
 
-   constructor function any_type_mapper ( p_value anydata ) return self as result is
+   constructor function any_type_mapper( self in out nocopy any_type_mapper, p_value anydata ) return self as result is
       begin
          self.type_code := p_value.gettype( self.attribute_type );
          self.build_in_type_name := get_build_in_typename();
@@ -46,7 +46,7 @@ create or replace type body any_type_mapper is
                            return;
       end;
 
-   constructor function any_type_mapper ( p_child_position pls_integer, p_parent_type anytype ) return self as result is
+   constructor function any_type_mapper( self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result is
       begin
          if p_parent_type is not null
          then
@@ -96,19 +96,26 @@ create or replace type body any_type_mapper is
          end;
       end;
 
-   member function get_type
-      return varchar2 is
+   member function get_type return varchar2 is
+      v_result varchar2(100);
       begin
-         return get_typename( )
-                || case
-                   when prec is not null and not ( prec = 0 and NVL( scale, 0 ) = -127 )
-                      then
-                         '(' || prec || case when scale is not null
-                            then ',' || scale end || ')'
-                   when len is not null
-                      then
-                         '(' || len || ')'
-                   end;
+         if type_code = dbms_types.typecode_interval_ds then
+            v_result := 'INTERVAL DAY(9) TO SECOND(6)';
+         elsif type_code = dbms_types.typecode_interval_ym then
+               v_result := 'INTERVAL YEAR(9) TO MONTH';
+         else
+            v_result := get_typename( )
+            || case
+               when prec is not null and not ( prec = 0 and NVL( scale, 0 ) = -127 )
+                  then
+                     '(' || prec || case when scale is not null
+                        then ',' || scale end || ')'
+               when len is not null
+                  then
+                     '(' || len || ')'
+               end;
+         end if;
+         return v_result;
       end;
 
    member function is_attribute return boolean is
@@ -123,30 +130,30 @@ create or replace type body any_type_mapper is
       begin
          return
          case
-            when type_code = dbms_types.typecode_date then 'Date'
-            when type_code = dbms_types.typecode_number then 'Number'
-            when type_code = dbms_types.typecode_raw then 'Raw'
-            when type_code = dbms_types.typecode_char then 'Char'
-            when type_code = dbms_types.typecode_varchar2 then 'Varchar2'
-            when type_code = dbms_types.typecode_varchar then 'Varchar'
-            when type_code = dbms_types.typecode_blob then 'Blob'
-            when type_code = dbms_types.typecode_bfile then 'Bfile'
-            when type_code = dbms_types.typecode_clob then 'Clob'
-            when type_code = dbms_types.typecode_cfile then 'Cfile'
-            when type_code = dbms_types.typecode_timestamp then 'Timestamp'
-            when type_code = dbms_types.typecode_timestamp_tz then 'TimestampTZ'
-            when type_code = dbms_types.typecode_timestamp_ltz then 'TimestampLTZ'
-            when type_code = dbms_types.typecode_interval_ym then 'IntervalYM'
-            when type_code = dbms_types.typecode_interval_ds then 'IntervalDS'
-            when type_code = dbms_types.typecode_nchar then 'Nchar'
-            when type_code = dbms_types.typecode_nvarchar2 then 'Nvarchar2'
-            when type_code = dbms_types.typecode_nclob then 'Nclob'
-            when type_code = dbms_types.typecode_bfloat then 'BFloat'
-            when type_code = dbms_types.typecode_bdouble then 'BDouble'
-            when type_code = dbms_types.typecode_object then 'Object'
-            when type_code = dbms_types.typecode_varray then 'Collection'
-            when type_code = dbms_types.typecode_table then 'Collection'
-            when type_code = dbms_types.typecode_namedcollection then 'Collection'
+         when type_code = dbms_types.typecode_bdouble then 'BDouble'
+         when type_code = dbms_types.typecode_bfile then 'Bfile' --not supported yet
+         when type_code = dbms_types.typecode_bfloat then 'BFloat'
+         when type_code = dbms_types.typecode_blob then 'Blob'
+         when type_code = dbms_types.typecode_cfile then 'Cfile' --not supported yet
+         when type_code = dbms_types.typecode_char then 'Char'
+         when type_code = dbms_types.typecode_clob then 'Clob'
+         when type_code = dbms_types.typecode_varray then 'Collection'
+         when type_code = dbms_types.typecode_table then 'Collection'
+         when type_code = dbms_types.typecode_namedcollection then 'Collection'
+         when type_code = dbms_types.typecode_date then 'Date'
+         when type_code = dbms_types.typecode_interval_ds then 'IntervalDS'
+         when type_code = dbms_types.typecode_interval_ym then 'IntervalYM'
+         when type_code = dbms_types.typecode_nchar then 'Nchar'
+         when type_code = dbms_types.typecode_nclob then 'Nclob'
+         when type_code = dbms_types.typecode_number then 'Number'
+         when type_code = dbms_types.typecode_nvarchar2 then 'Nvarchar2'
+         when type_code = dbms_types.typecode_object then 'Object'
+         when type_code = dbms_types.typecode_raw then 'Raw'
+         when type_code = dbms_types.typecode_timestamp then 'Timestamp'
+         when type_code = dbms_types.typecode_timestamp_tz then 'TimestampTZ'
+         when type_code = dbms_types.typecode_timestamp_ltz then 'TimestampLTZ'
+         when type_code = dbms_types.typecode_varchar then 'Varchar'
+         when type_code = dbms_types.typecode_varchar2 then 'Varchar2'
          end;
       end;
    member function get_build_in_typename return varchar2 is

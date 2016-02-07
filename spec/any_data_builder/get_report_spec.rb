@@ -1,8 +1,8 @@
-require 'anydata_reporter'
+require 'install'
 
-describe 'get report from any data' do
+describe 'Build reportable any data from ANYDATA' do
 
-  def exec_reporter(anydata)
+  def return_string_value(anydata)
     sql =  <<-SQL
       BEGIN
         :x := any_data_builder.build( #{anydata} ).to_string();
@@ -52,26 +52,21 @@ describe 'get report from any data' do
 
   context 'for build-in Oracle types' do
 
-    it 'reports a NUMBER datatype' do
-      result = exec_reporter 'ANYDATA.ConvertNumber( 3 )'
-      expect( result ).to eq '3'
-    end
-
-    it 'reports a VARCHAR2 datatype' do
-      result = exec_reporter "ANYDATA.ConvertVarchar2( 'Sample varchar' )"
-      expect( result ).to eq "'Sample varchar'"
-    end
-
     [
-      {type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: '2015-11-21 20:01:01'},
       {type: 'BINARY_DOUBLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: '1.23456789E+002'},
       {type: 'BINARY_FLOAT',  in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: '1.23456001E+002'},
       {type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: '1234%$#$%DRGSDFG$#%'},
-      {type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'"},
       {type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'clob value'},
+      {type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'"},
+      {type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: '2015-11-21 20:01:01'},
+      {type: 'INTERVAL DAY TO SECOND', in_val: "ANYDATA.ConvertIntervalDS( INTERVAL '12 23:59:59.123456' DAY TO SECOND )", expected: '+000000012 23:59:59.123456000'},
+      {type: 'INTERVAL YEAR TO MONTH', in_val: "ANYDATA.ConvertIntervalYM( INTERVAL '99-11' YEAR TO MONTH )", expected: '+000000099-11'},
+      {type: 'NUMBER', in_val: 'ANYDATA.ConvertNumber( 3 )', expected: '3'},
+      {type: 'VARCHAR', in_val: "ANYDATA.ConvertVarchar( 'Sample varchar' )", expected: "'Sample varchar'"},
+      {type: 'VARCHAR2', in_val: "ANYDATA.ConvertVarchar2( 'Sample varchar2' )", expected: "'Sample varchar2'"},
     ].each do |test_case|
       it "reports a #{test_case[:type]} datatype" do
-        expect( exec_reporter test_case[:in_val] ).to eq test_case[:expected]
+        expect(return_string_value test_case[:in_val] ).to eq test_case[:expected]
       end
     end
   end
@@ -84,12 +79,11 @@ describe 'get report from any data' do
    TEXT => 'some ''characters',
    ID => 1234567890.12345678901
 )"
-      expect( exec_reporter "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
     end
 
     it 'reports on object within an object' do
-      test_object="test_obj( 'some characters', 1234567890.12345678901)"
-      test_parent_object="test_parent_object( 1234, #{test_object} )"
+      test_object="test_parent_object( 1234, test_obj( 'some characters', 1234567890.12345678901) )"
       expected = "GENERIC_UTIL.TEST_PARENT_OBJECT(
    SOME_ID => 1234,
    CHILD_OBJ => GENERIC_UTIL.TEST_OBJ(
@@ -97,7 +91,7 @@ describe 'get report from any data' do
       ID => 1234567890.12345678901
    )
 )"
-      expect( exec_reporter "ANYDATA.ConvertObject( #{test_parent_object} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
     end
 
     it 'reports on collection within an object' do
@@ -114,7 +108,7 @@ describe 'get report from any data' do
    ),
    A_NUM2 => 1.23
 )"
-      expect( exec_reporter "ANYDATA.ConvertObject( #{test_col_obj} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertObject( #{test_col_obj} )" ).to eq expected
     end
 
   end
@@ -131,7 +125,7 @@ describe 'get report from any data' do
    7.8,
    9
 )'
-      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
 
     end
 
@@ -148,7 +142,7 @@ describe 'get report from any data' do
       ID => 1
    )
 )"
-      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
     end
 
     it 'reports on collection of collections' do
@@ -168,7 +162,7 @@ describe 'get report from any data' do
       7.89
    )
 )'
-      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )" ).to eq expected
     end
 
     it 'reports on collection of objects with collections' do
@@ -195,29 +189,9 @@ describe 'get report from any data' do
       A_NUM2 => 1.23
    )
 )"
-      expect( exec_reporter "ANYDATA.ConvertCollection( #{test_col_obj_col} )" ).to eq expected
+      expect(return_string_value "ANYDATA.ConvertCollection( #{test_col_obj_col} )" ).to eq expected
     end
 
-  end
-
-  context 'suptypes' do
-    context 'subtypes of object type' do
-
-      it 'reports on subtype if super type variable with subtype value passed' do
-        pending 'to be implemented'
-        expect(1).to eq 0
-      end
-
-
-    end
-
-    context 'collection of type with subtypes' do
-
-      it 'reports on subtypes passed to collection' do
-        pending 'to be implemented'
-        expect(1).to eq 0
-      end
-    end
   end
 
 end

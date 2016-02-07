@@ -2,6 +2,10 @@ drop package any_data_builder;
 /
 drop type any_type_mapper;
 /
+drop type any_data_intervalym;
+/
+drop type any_data_intervalds;
+/
 drop type any_data_clob;
 /
 drop type any_data_blob;
@@ -13,6 +17,8 @@ drop type any_data_bdouble;
 drop type any_data_date;
 /
 drop type any_data_char;
+/
+drop type any_data_varchar;
 /
 drop type any_data_varchar2;
 /
