@@ -100,7 +100,7 @@ create or replace type body any_type_mapper is
       v_result varchar2(100);
       begin
          if type_code = dbms_types.typecode_interval_ds then
-            v_result := 'INTERVAL DAY(9) TO SECOND(6)';
+            v_result := 'INTERVAL DAY(9) TO SECOND(9)';
          elsif type_code = dbms_types.typecode_interval_ym then
                v_result := 'INTERVAL YEAR(9) TO MONTH';
          else
