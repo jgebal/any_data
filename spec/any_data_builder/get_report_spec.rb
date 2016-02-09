@@ -16,6 +16,22 @@ describe 'Build reportable any data from ANYDATA' do
   before(:all) do
     plsql.execute 'create or replace type test_col as table of number(5,3)'
     plsql.execute <<-SQL
+      create or replace type datatype_obj as object(
+      a01 BINARY_DOUBLE,
+      a02 BINARY_FLOAT,
+      a03 BLOB,
+      a04 CLOB,
+      a05 CHAR(1),
+      a06 DATE,
+      a07 INTEGER,
+      a08 INTERVAL DAY(9) TO SECOND(9),
+      a09 INTERVAL YEAR(9) TO MONTH,
+      a10 NUMBER,
+      a11 VARCHAR(32767),
+      a12 VARCHAR2(32767)
+      )
+    SQL
+    plsql.execute <<-SQL
       create or replace type test_obj as object(
         text varchar2(100),
         id number(22,11) )
@@ -41,13 +57,15 @@ describe 'Build reportable any data from ANYDATA' do
   end
 
   after(:all) do
-    plsql.execute 'drop type test_col_obj_col force'
-    plsql.execute 'drop type test_parent_object force'
-    plsql.execute 'drop type test_col_obj force'
-    plsql.execute 'drop type test_col_col force'
-    plsql.execute 'drop type test_obj_col force'
-    plsql.execute 'drop type test_obj force'
-    plsql.execute 'drop type test_col force'
+    plsql.execute 'drop type test_col_obj_col force' rescue nil
+    plsql.execute 'drop type test_parent_object force' rescue nil
+    plsql.execute 'drop type test_col_obj force' rescue nil
+    plsql.execute 'drop type test_col_col force' rescue nil
+    plsql.execute 'drop type test_obj_col force' rescue nil
+    plsql.execute 'drop type test_obj force' rescue nil
+    plsql.execute 'drop type test_col force' rescue nil
+    plsql.execute 'drop type datatype_obj force' rescue nil
+
   end
 
   context 'for build-in Oracle types' do
@@ -55,10 +73,11 @@ describe 'Build reportable any data from ANYDATA' do
     [
       {type: 'BINARY_DOUBLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: '1.23456789E+002'},
       {type: 'BINARY_FLOAT',  in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: '1.23456001E+002'},
-      {type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: '1234%$#$%DRGSDFG$#%'},
-      {type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: 'clob value'},
+      {type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'"},
+      {type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: "'clob value'"},
       {type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'"},
       {type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: '2015-11-21 20:01:01'},
+      {type: 'INTEGER', in_val: 'ANYDATA.ConvertNumber( CAST(1 AS INTEGER) )', expected: '1'},
       {type: 'INTERVAL DAY TO SECOND', in_val: "ANYDATA.ConvertIntervalDS( INTERVAL '123456789 23:59:59.123456789' DAY TO SECOND )", expected: '+123456789 23:59:59.123456789'},
       {type: 'INTERVAL YEAR TO MONTH', in_val: "ANYDATA.ConvertIntervalYM( INTERVAL '123456789-11' YEAR TO MONTH )", expected: '+123456789-11'},
       {type: 'NUMBER', in_val: 'ANYDATA.ConvertNumber( 3 )', expected: '3'},
@@ -74,10 +93,33 @@ describe 'Build reportable any data from ANYDATA' do
   context 'for user defined object type' do
 
     it 'reports an object type' do
-      test_object="test_obj( 'some ''characters', 1234567890.12345678901)"
-      expected = "GENERIC_UTIL.TEST_OBJ(
-   TEXT => 'some ''characters',
-   ID => 1234567890.12345678901
+      test_object="GENERIC_UTIL.DATATYPE_OBJ(
+   A01 => 123.456789,
+   A02 => 123.456,
+   A03 => utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%'),
+   A04 => 'clob value',
+   A05 => 'Y',
+   A06 => TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ),
+   A07 => 1,
+   A08 => INTERVAL '123456789 23:59:59.123456789' DAY TO SECOND,
+   A09 => INTERVAL '123456789-11' YEAR TO MONTH,
+   A10 => 3.1234567890123456789012345678901234567,
+   A11 => 'Sample varchar',
+   A12 => 'Sample varchar2'
+)"
+      expected = "GENERIC_UTIL.DATATYPE_OBJ(
+   A01 => 1.23456789E+002,
+   A02 => 1.23456001E+002,
+   A03 => '1234%$#$%DRGSDFG$#%',
+   A04 => 'clob value',
+   A05 => 'Y',
+   A06 => 2015-11-21 20:01:01,
+   A07 => 1,
+   A08 => +123456789 23:59:59.123456789,
+   A09 => +123456789-11,
+   A10 => 3.1234567890123456789012345678901234567,
+   A11 => 'Sample varchar',
+   A12 => 'Sample varchar2'
 )"
       expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )" ).to eq expected
     end

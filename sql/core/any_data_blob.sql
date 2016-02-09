@@ -9,7 +9,7 @@ create or replace type body any_data_blob as
 
    overriding member function to_string return varchar2 is
       begin
-         return utl_raw.cast_to_varchar2( dbms_lob.substr( data_value, any_data_formatter.max_return_data_length ) );
+         return ''''||replace( utl_raw.cast_to_varchar2( dbms_lob.substr( data_value, any_data_formatter.max_return_data_length ) ), '''', '''''')||'''';
       end;
 
    constructor function any_data_blob( self in out nocopy any_data_blob, p_data blob ) return self as result is

@@ -137,15 +137,13 @@ create or replace type body any_type_mapper is
          when type_code = dbms_types.typecode_cfile then 'Cfile' --not supported yet
          when type_code = dbms_types.typecode_char then 'Char'
          when type_code = dbms_types.typecode_clob then 'Clob'
-         when type_code = dbms_types.typecode_varray then 'Collection'
-         when type_code = dbms_types.typecode_table then 'Collection'
-         when type_code = dbms_types.typecode_namedcollection then 'Collection'
+         when type_code in (dbms_types.typecode_varray, dbms_types.typecode_table, dbms_types.typecode_namedcollection) then 'Collection'
          when type_code = dbms_types.typecode_date then 'Date'
          when type_code = dbms_types.typecode_interval_ds then 'IntervalDS'
          when type_code = dbms_types.typecode_interval_ym then 'IntervalYM'
          when type_code = dbms_types.typecode_nchar then 'Nchar'
          when type_code = dbms_types.typecode_nclob then 'Nclob'
-         when type_code = dbms_types.typecode_number then 'Number'
+         when type_code in( dbms_types.typecode_number, 3 /*INTEGER*/) then 'Number'
          when type_code = dbms_types.typecode_nvarchar2 then 'Nvarchar2'
          when type_code = dbms_types.typecode_object then 'Object'
          when type_code = dbms_types.typecode_raw then 'Raw'
@@ -154,6 +152,7 @@ create or replace type body any_type_mapper is
          when type_code = dbms_types.typecode_timestamp_ltz then 'TimestampLTZ'
          when type_code = dbms_types.typecode_varchar then 'Varchar'
          when type_code = dbms_types.typecode_varchar2 then 'Varchar2'
+         else to_char(type_code)
          end;
       end;
    member function get_build_in_typename return varchar2 is
