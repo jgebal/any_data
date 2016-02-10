@@ -66,13 +66,12 @@ create or replace package body any_data_builder as
          elsif p_type.type_code = dbms_types.typecode_object then
             v_declare_sql :=
                c_indent||v_out||' any_data := '||p_type.get_any_data_object_name() || '(''' || p_type.get_typename() || ''');'||c_nl||
-               c_indent||v_anydata||' anydata := anydata.convertObject( '||v_data_breadcrumb || ' );'||c_nl||
-               c_indent||v_any_type||' any_type_mapper := any_type_mapper( '||v_anydata ||' );';
+               c_indent||v_anydata||' anydata := anydata.convertObject( '||v_data_breadcrumb || ' );';
             for i in 1 .. p_type.attributes_count loop
                v_code_sql := v_code_sql ||
                   indent_lines(
-                     'if ' || v_any_type || '.get_typename() != ''' || p_type.get_typename( ) || ''' then' || c_nl ||
-                     c_indent || v_out || ' := any_data_builder.build( ' || v_anydata || ', '||v_any_type||' );' || c_nl ||
+                     'if ' || v_anydata || '.gettypename() != ''' || p_type.get_typename( ) || ''' then' || c_nl ||
+                     c_indent || v_out || ' := any_data_builder.build( ' || v_anydata || ' );' || c_nl ||
                      'else' ||
                      indent_lines(
                         build_sql(
@@ -88,7 +87,7 @@ create or replace package body any_data_builder as
          end if;
 
          if p_type.is_attribute then
-            v_return_sql := 'any_data_attribute( ''' || p_type.attribute_name || ''', ' || v_out || ' )';
+            v_return_sql := 'any_data_attribute( NULL, ''' || p_type.attribute_name || ''', ' || v_out || ' )';
          else
             v_return_sql := v_out;
          end if;
@@ -113,19 +112,16 @@ create or replace package body any_data_builder as
          return v_sql;
       end;
 
-   function build( p_any_data anydata ) return any_data is
-      begin
---          v_sql := get_conversion_sql( any_type_mapper( p_any_data ) );
---          execute immediate v_sql using in p_any_data, out v_result;
---          return v_result;
-         return build( p_any_data, any_type_mapper( p_any_data ) );
-      end;
-
    function build( p_any_data anydata, p_any_type any_type_mapper ) return any_data is
       v_result any_data;
       begin
          execute immediate get_conversion_sql( p_any_type ) using in p_any_data, out v_result;
          return v_result;
+      end;
+
+   function build( p_any_data anydata ) return any_data is
+      begin
+         return build( p_any_data, any_type_mapper( p_any_data ) );
       end;
 
 end;
