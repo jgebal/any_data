@@ -19,6 +19,7 @@ create or replace type any_type_mapper as object (
    member function get_attribute_type( p_child_position integer := null ) return any_type_mapper,
    member procedure update_from_attribute_type( self in out nocopy any_type_mapper ),
    member function is_attribute return boolean,
+   member function get_any_data_constructor( p_value_var_name varchar2 ) return varchar2,
    member function get_any_data_object_name return varchar2,
    member function get_anydata_getter return varchar2,
    member function get_build_in_typename return varchar2
@@ -121,6 +122,10 @@ create or replace type body any_type_mapper is
    member function is_attribute return boolean is
       begin
          return (attribute_name is not null);
+      end;
+   member function get_any_data_constructor( p_value_var_name varchar2 ) return varchar2 is
+      begin
+         return get_any_data_object_name()||'( any_type( '||type_code||', '''||get_build_in_typename||''' ), '||p_value_var_name||' )';
       end;
    member function get_any_data_object_name return varchar2 is
       begin

@@ -65,7 +65,7 @@ create or replace package body any_data_builder as
                c_indent||'end loop;'||c_nl;
          elsif p_type.type_code = dbms_types.typecode_object then
             v_declare_sql :=
-               c_indent||v_out||' any_data := '||p_type.get_any_data_object_name() || '(''' || p_type.get_typename() || ''');'||c_nl||
+               c_indent||v_out||' any_data := any_data_object( any_type( '||p_type.type_code||', '''|| p_type.get_typename()||'''), any_data_tab() );'||c_nl||
                c_indent||v_anydata||' anydata := anydata.convertObject( '||v_data_breadcrumb || ' );';
             for i in 1 .. p_type.attributes_count loop
                v_code_sql := v_code_sql ||
@@ -83,7 +83,8 @@ create or replace package body any_data_builder as
                   );
             end loop;
          else
-             v_out := p_type.get_any_data_object_name() || '(' || v_data_breadcrumb || ')';
+--             v_out := p_type.get_any_data_object_name() || '(' || v_data_breadcrumb || ')';
+            v_out := p_type.get_any_data_constructor( v_data_breadcrumb );
          end if;
 
          if p_type.is_attribute then
