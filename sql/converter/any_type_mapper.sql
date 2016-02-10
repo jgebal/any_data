@@ -16,7 +16,7 @@ create or replace type any_type_mapper as object (
    constructor function any_type_mapper (  self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result,
    member function get_type return varchar2,
    member function get_typename return varchar2,
-   member function get_attribute_type( p_child_position pls_integer ) return any_type_mapper,
+   member function get_attribute_type( p_child_position integer := null ) return any_type_mapper,
    member procedure update_from_attribute_type( self in out nocopy any_type_mapper ),
    member function is_attribute return boolean,
    member function get_any_data_object_name return varchar2,
@@ -27,7 +27,7 @@ create or replace type any_type_mapper as object (
 
 create or replace type body any_type_mapper is
 
-   member function get_attribute_type( p_child_position pls_integer ) return any_type_mapper is
+   member function get_attribute_type( p_child_position integer := null ) return any_type_mapper is
       begin
          return any_type_mapper( p_child_position, self.attribute_type );
       end;

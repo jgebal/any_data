@@ -40,6 +40,8 @@ create or replace package body any_data_builder as
       v_code_sql          varchar2(32767);
       v_data_breadcrumb   varchar2(4000) := p_data_breadcrumb;
       v_out               varchar2(1000) := 'v_out_'||p_level;
+      v_anydata           varchar2(30)   := 'v_anydata_'||p_level;
+      v_any_type          varchar2(30)   := 'v_any_type_'||p_level;
       v_iter              varchar2(30)  := 'i'||p_level;
       begin
          if p_type.is_attribute then
@@ -48,14 +50,14 @@ create or replace package body any_data_builder as
 
          if p_type.type_code in ( dbms_types.typecode_table, dbms_types.typecode_varray, dbms_types.typecode_namedcollection ) then
             v_declare_sql :=
-               c_indent||v_out||' '||p_type.get_any_data_object_name()||' := '||p_type.get_any_data_object_name()||'('''||p_type.get_typename()||''', '||p_type.type_code||');'||c_nl||
+               c_indent||v_out||' any_data := '||p_type.get_any_data_object_name()||'('''||p_type.get_typename()||''', '||p_type.type_code||');'||c_nl||
                c_indent||v_iter||' integer := '||v_data_breadcrumb||'.first;'
             ;
             v_code_sql :=
                c_indent||'while '||v_iter||' is not null loop'||c_nl||
                indent_lines(
                   build_sql(
-                     p_type.get_attribute_type( 1 ), v_data_breadcrumb||'('||v_iter||')',
+                     p_type.get_attribute_type(), v_data_breadcrumb||'('||v_iter||')',
                      v_out||'.add_element('||c_value||');', p_level + 1
                   ), 2
                )||c_nl||
@@ -63,15 +65,23 @@ create or replace package body any_data_builder as
                c_indent||'end loop;'||c_nl;
          elsif p_type.type_code = dbms_types.typecode_object then
             v_declare_sql :=
-               c_indent||v_out||' '||p_type.get_any_data_object_name()||' := '||p_type.get_any_data_object_name() || '(''' || p_type.get_typename() || ''');';
+               c_indent||v_out||' any_data := '||p_type.get_any_data_object_name() || '(''' || p_type.get_typename() || ''');'||c_nl||
+               c_indent||v_anydata||' anydata := anydata.convertObject( '||v_data_breadcrumb || ' );'||c_nl||
+               c_indent||v_any_type||' any_type_mapper := any_type_mapper( '||v_anydata ||' );';
             for i in 1 .. p_type.attributes_count loop
                v_code_sql := v_code_sql ||
                   indent_lines(
-                     build_sql(
-                        p_type.get_attribute_type( i ), v_data_breadcrumb,
-                        v_out || '.add_element(' || c_value || ');', p_level + 1
-                     )
-                  )||c_nl;
+                     'if ' || v_any_type || '.get_typename() != ''' || p_type.get_typename( ) || ''' then' || c_nl ||
+                     c_indent || v_out || ' := any_data_builder.build( ' || v_anydata || ', '||v_any_type||' );' || c_nl ||
+                     'else' ||
+                     indent_lines(
+                        build_sql(
+                           p_type.get_attribute_type( i ), v_data_breadcrumb,
+                           v_out || '.add_element(' || c_value || ');', p_level + 1
+                        )
+                     ) || c_nl ||
+                     'end if;' || c_nl
+                  );
             end loop;
          else
              v_out := p_type.get_any_data_object_name() || '(' || v_data_breadcrumb || ')';
@@ -104,12 +114,19 @@ create or replace package body any_data_builder as
       end;
 
    function build( p_any_data anydata ) return any_data is
-      v_sql    varchar2(32767);
+      begin
+--          v_sql := get_conversion_sql( any_type_mapper( p_any_data ) );
+--          execute immediate v_sql using in p_any_data, out v_result;
+--          return v_result;
+         return build( p_any_data, any_type_mapper( p_any_data ) );
+      end;
+
+   function build( p_any_data anydata, p_any_type any_type_mapper ) return any_data is
       v_result any_data;
       begin
-         v_sql := get_conversion_sql( any_type_mapper( p_any_data ) );
-         execute immediate v_sql using in p_any_data, out v_result;
+         execute immediate get_conversion_sql( p_any_type ) using in p_any_data, out v_result;
          return v_result;
       end;
+
 end;
 /
