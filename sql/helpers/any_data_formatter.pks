@@ -7,5 +7,8 @@ create or replace package any_data_formatter as
 
    function indent_lines( p_string varchar2, p_times integer := 1 ) return varchar2;
 
+   function split_nl_string_to_array( p_string varchar2 ) return string_array;
+   function split_nl_clob_to_array( p_clob clob ) return string_array;
+
 end;
 /

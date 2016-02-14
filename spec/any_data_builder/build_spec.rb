@@ -1,5 +1,3 @@
-require 'install'
-
 describe 'Build reportable any data from ANYDATA' do
 
   def return_string_value(anydata)
