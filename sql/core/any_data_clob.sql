@@ -1,15 +1,15 @@
 create or replace type any_data_clob under any_data(
    data_value clob,
-   overriding member function to_string return varchar2,
+   overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_clob( self in out nocopy any_data_clob, p_data clob ) return self as result
 );
 /
 
 create or replace type body any_data_clob as
 
-   overriding member function to_string return varchar2 is
+   overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
-         return ''''||replace( to_char( dbms_lob.substr( data_value, any_data_formatter.max_return_data_length ) ) , '''', '''''')||'''';
+         return string_array( ''''||replace( to_char( dbms_lob.substr( data_value, any_data_formatter.max_return_data_length ) ) , '''', '''''')||'''' || p_separator );
       end;
 
    constructor function any_data_clob( self in out nocopy any_data_clob, p_data clob ) return self as result is

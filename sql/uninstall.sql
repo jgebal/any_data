@@ -40,3 +40,5 @@ drop type any_type;
 /
 drop package any_data_formatter;
 /
+drop type string_array;
+/

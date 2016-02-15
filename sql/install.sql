@@ -1,5 +1,6 @@
 @@uninstall.sql
 
+@@helpers/string_array.sql
 @@helpers/any_data_formatter.pks
 @@helpers/any_data_formatter.pkb
 

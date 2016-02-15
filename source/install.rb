@@ -2,6 +2,7 @@ require_relative 'support/execute_sqlplus_file'
 
 [
   '../../../sql/uninstall.sql',
+  '../../../sql/helpers/string_array.sql',
   '../../../sql/helpers/any_data_formatter.pks',
   '../../../sql/helpers/any_data_formatter.pkb',
   '../../../sql/core/any_type.sql',
