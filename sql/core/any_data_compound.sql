@@ -1,4 +1,4 @@
-create or replace type any_data_compound under any_data(
+create or replace type any_data_compound authid current_user under any_data(
    data_values     any_data_tab,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    overriding member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ),
@@ -17,7 +17,7 @@ create or replace type body any_data_compound as
       v_result_idx     binary_integer := 2;
       v_separator      varchar2(1) := ',';
       begin
-         v_result := string_array( self.get_type().type_name || '(' );
+         v_result := string_array( self.type_name || '(' );
 
          for i in 1 .. v_values_count loop
             if i = v_values_count then v_separator := null; end if;

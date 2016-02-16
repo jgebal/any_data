@@ -5,7 +5,6 @@ require_relative 'support/execute_sqlplus_file'
   '../../../sql/helpers/string_array.sql',
   '../../../sql/helpers/any_data_formatter.pks',
   '../../../sql/helpers/any_data_formatter.pkb',
-  '../../../sql/core/any_type.sql',
   '../../../sql/core/any_data.tps',
   '../../../sql/core/any_data_attribute.sql',
   '../../../sql/core/any_data_tab.sql',

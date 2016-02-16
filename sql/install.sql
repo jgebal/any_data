@@ -1,10 +1,9 @@
 @@uninstall.sql
 
+alter session set plsql_optimize_level = 3;
 @@helpers/string_array.sql
 @@helpers/any_data_formatter.pks
 @@helpers/any_data_formatter.pkb
-
-@@core/any_type.sql
 
 @@core/any_data.tps
 @@core/any_data_attribute.sql

@@ -1,8 +1,8 @@
-create or replace type any_data as object(
-   type_info any_type,
+create or replace type any_data authid current_user as object(
+   type_code number(38, 0),
+   type_name varchar2(100),
    final member function to_string return varchar2,
    not instantiable member function to_string_array( p_separator varchar2 := null ) return string_array,
-   member function get_type return any_type,
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ),
    member function get_element( p_position integer ) return any_data,
    member function get_elements_count return integer
@@ -10,11 +10,6 @@ create or replace type any_data as object(
 /
 
 create or replace type body any_data as
-
-   member function get_type return any_type is
-      begin
-         return type_info;
-      end;
 
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ) is
       begin

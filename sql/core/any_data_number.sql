@@ -1,4 +1,4 @@
-create or replace type any_data_number under any_data(
+create or replace type any_data_number authid current_user under any_data(
    data_value number,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_number( self in out nocopy any_data_number, p_data number ) return self as result
@@ -14,7 +14,8 @@ create or replace type body any_data_number as
 
    constructor function any_data_number( self in out nocopy any_data_number, p_data number ) return self as result is
       begin
-         self.type_info := any_type( dbms_types.typecode_number, 'NUMBER' );
+         self.type_code := dbms_types.typecode_number;
+         self.type_name := 'NUMBER';
          self.data_value := p_data;
          return;
       end;

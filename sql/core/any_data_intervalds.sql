@@ -1,4 +1,4 @@
-create or replace type any_data_intervalds under any_data(
+create or replace type any_data_intervalds authid current_user under any_data(
    data_value dsinterval_unconstrained,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_intervalds( self in out nocopy any_data_intervalds, p_data dsinterval_unconstrained ) return self as result
@@ -12,12 +12,13 @@ create or replace type body any_data_intervalds as
          return string_array( to_char( data_value ) || p_separator );
       end;
 
-   /* Alternative implementation using 'unsconstrained' data type workaround
+   /* Alternative implementation using 'unconstrained' data type workaround
      https://docs.oracle.com/cd/B19306_01/appdev.102/b14261/datatypes.htm
    */
    constructor function any_data_intervalds( self in out nocopy any_data_intervalds, p_data dsinterval_unconstrained ) return self as result is
       begin
-         self.type_info := any_type( dbms_types.typecode_number, 'INTERVAL DAY TO SECOND' );
+         self.type_code := dbms_types.typecode_interval_ds;
+         self.type_name := 'INTERVAL DAY TO SECOND';
          self.data_value := p_data;
          return;
       end;

@@ -36,8 +36,6 @@ drop type any_data_attribute;
 /
 drop type any_data;
 /
-drop type any_type;
-/
 drop package any_data_formatter;
 /
 drop type string_array;
