@@ -14,7 +14,7 @@ create or replace type body any_data_bfloat as
 
    constructor function any_data_bfloat( self in out nocopy any_data_bfloat, p_data binary_float ) return self as result is
       begin
-         self.type_code := dbms_types.typecode_number;
+         self.type_code := dbms_types.typecode_bfloat;
          self.type_name := 'BINARY_FLOAT';
          self.data_value := p_data;
          return;
