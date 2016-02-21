@@ -132,8 +132,9 @@ create or replace type body any_type_mapper is
          return 'any_data_'||lower( get_anydata_getter() );
       end;
    member function get_anydata_getter return varchar2 is
+      v_result varchar2(50);
       begin
-         return
+         v_result :=
          case
          when type_code = dbms_types.typecode_bdouble then 'BDouble'
          when type_code = dbms_types.typecode_bfile then 'Bfile' --not supported yet
@@ -148,7 +149,7 @@ create or replace type body any_type_mapper is
          when type_code = dbms_types.typecode_interval_ym then 'IntervalYM'
          when type_code = dbms_types.typecode_nchar then 'Nchar'
          when type_code = dbms_types.typecode_nclob then 'Nclob'
-         when type_code in( dbms_types.typecode_number, 3 /*INTEGER*/) then 'Number'
+         when type_code in( dbms_types.typecode_number, 3 /*INTEGER*/, 246 /*SMALLINT*/) then 'Number'
          when type_code = dbms_types.typecode_nvarchar2 then 'Nvarchar2'
          when type_code = dbms_types.typecode_object then 'Object'
          when type_code = dbms_types.typecode_raw then 'Raw'
@@ -157,9 +158,13 @@ create or replace type body any_type_mapper is
          when type_code = dbms_types.typecode_timestamp_ltz then 'TimestampLTZ'
          when type_code = dbms_types.typecode_varchar then 'Varchar'
          when type_code = dbms_types.typecode_varchar2 then 'Varchar2'
-         else to_char(type_code)
          end;
+         if v_result is null then
+            raise_application_error( -20000, 'Unknown typecode = '|| type_code );
+         end if;
+         return v_result;
       end;
+
    member function get_build_in_typename return varchar2 is
       begin
          return

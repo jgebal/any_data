@@ -18,14 +18,15 @@ end
 
 [
   { any_type_name: 'any_data_bdouble', type_code: plsql.dbms_types.typecode_bdouble, type_name: 'BINARY_DOUBLE', data_value: 123.456789 },
-  { any_type_name: 'any_data_bfloat', type_code: plsql.dbms_types.typecode_bfloat, type_name: 'BINARY_FLOAT', data_value: 123.456 },
+  { any_type_name: 'any_data_bfloat', type_code: plsql.dbms_types.typecode_bfloat, type_name: 'BINARY_FLOAT', data_value: 123.125 },
   { any_type_name: 'any_data_blob', type_code: plsql.dbms_types.typecode_blob, type_name: 'BLOB', data_value: '1234%$#$%DRGSDFG$#%' },
   { any_type_name: 'any_data_clob', type_code: plsql.dbms_types.typecode_clob, type_name: 'CLOB', data_value: 'clob value' },
   { any_type_name: 'any_data_char', type_code: plsql.dbms_types.typecode_char, type_name: 'CHAR', data_value: 'A' },
   { any_type_name: 'any_data_date', type_code: plsql.dbms_types.typecode_date, type_name: 'DATE', data_value: Time.today },
   { any_type_name: 'any_data_number', type_code: plsql.dbms_types.typecode_number, type_name: 'INTEGER', data_value: 1 },
-  { any_type_name: 'any_data_intervalds', type_code: plsql.dbms_types.typecode_interval_ds, type_name: 'INTERVAL DAY TO SECOND', data_value: '123456789 23:59:59.123456789' },
-  { any_type_name: 'any_data_intervalym', type_code: plsql.dbms_types.typecode_interval_ym, type_name: 'INTERVAL YEAR TO MONTH', data_value: '123456789-11' },
+  #  not supported by ruby-plsql
+  # { any_type_name: 'any_data_intervalds', type_code: plsql.dbms_types.typecode_interval_ds, type_name: 'INTERVAL DAY TO SECOND', data_value: 123456789.123456789 },
+  # { any_type_name: 'any_data_intervalym', type_code: plsql.dbms_types.typecode_interval_ym, type_name: 'INTERVAL YEAR TO MONTH', data_value: 11 },
   { any_type_name: 'any_data_number', type_code: plsql.dbms_types.typecode_number, type_name: 'NUMBER', data_value: 3 },
   { any_type_name: 'any_data_varchar', type_code: plsql.dbms_types.typecode_varchar, type_name: 'VARCHAR', data_value: 'Sample varchar' },
   { any_type_name: 'any_data_varchar2', type_code: plsql.dbms_types.typecode_varchar2, type_name: 'VARCHAR2', data_value: 'Sample varchar2' },

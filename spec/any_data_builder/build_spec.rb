@@ -26,7 +26,10 @@ describe 'Build reportable any data from ANYDATA' do
       a09 INTERVAL YEAR(9) TO MONTH,
       a10 NUMBER,
       a11 VARCHAR(32767),
-      a12 VARCHAR2(32767)
+      a12 VARCHAR2(32767),
+      a13 CHARACTER VARYING(30) ,
+      a14 INT,
+      a15 SMALLINT
       )
     SQL
     plsql.execute <<-SQL
@@ -114,7 +117,10 @@ describe 'Build reportable any data from ANYDATA' do
    A09 => INTERVAL '123456789-11' YEAR TO MONTH,
    A10 => 3.1234567890123456789012345678901234567,
    A11 => 'Sample varchar',
-   A12 => 'Sample varchar2'
+   A12 => 'Sample varchar2',
+   A13 => 'Sample character varying',
+   A14 => 123456789,
+   A15 => 123456789
 )"
       expected   = "GENERIC_UTIL.DATATYPE_OBJ(
    A01 => 1.23456789E+002,
@@ -128,7 +134,10 @@ describe 'Build reportable any data from ANYDATA' do
    A09 => +123456789-11,
    A10 => 3.1234567890123456789012345678901234567,
    A11 => 'Sample varchar',
-   A12 => 'Sample varchar2'
+   A12 => 'Sample varchar2',
+   A13 => 'Sample character varying',
+   A14 => 123456789,
+   A15 => 123456789
 )"
       expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
     end
