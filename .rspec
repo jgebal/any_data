@@ -1,4 +1,4 @@
 --require spec_helper
---require ./source/install
+--require ./source/reinstall
 --require ruby_plsql_update
 

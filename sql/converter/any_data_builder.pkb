@@ -99,7 +99,7 @@ create or replace package body any_data_builder as
          end if;
 
          if p_type.is_attribute then
-            v_return_sql := 'any_data_attribute( NULL, NULL, ''' || p_type.attribute_name || ''', ' || v_out || ' )';
+            v_return_sql := 'any_data_attribute( NULL, NULL, ''any_data_attribute'', ''' || p_type.attribute_name || ''', ' || v_out || ' )';
          else
             v_return_sql := v_out;
          end if;

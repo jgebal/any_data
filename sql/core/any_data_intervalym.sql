@@ -19,6 +19,7 @@ create or replace type body any_data_intervalym as
       begin
          self.type_code := dbms_types.typecode_interval_ym;
          self.type_name := 'INTERVAL YEAR TO MONTH';
+         self.self_type_name := 'any_data_intervalym';
          self.data_value := p_data;
          return;
       end;

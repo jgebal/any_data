@@ -1,13 +1,13 @@
-create or replace type any_data_compound authid current_user under any_data(
+create or replace type any_data_family_compound authid current_user under any_data(
    data_values     any_data_tab,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
-   overriding member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ),
+   overriding member procedure add_element( self in out nocopy any_data_family_compound, p_attribute any_data ),
    overriding member function get_element( p_position integer ) return any_data,
    overriding member function get_elements_count return integer
 ) not final not instantiable;
 /
 
-create or replace type body any_data_compound as
+create or replace type body any_data_family_compound as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       v_result         string_array;
@@ -35,7 +35,7 @@ create or replace type body any_data_compound as
          return v_result;
       end;
 
-   overriding member procedure add_element( self in out nocopy any_data_compound, p_attribute any_data ) is
+   overriding member procedure add_element( self in out nocopy any_data_family_compound, p_attribute any_data ) is
       begin
          data_values.extend;
          data_values( data_values.last ) := p_attribute;

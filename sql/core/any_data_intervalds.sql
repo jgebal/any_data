@@ -19,6 +19,7 @@ create or replace type body any_data_intervalds as
       begin
          self.type_code := dbms_types.typecode_interval_ds;
          self.type_name := 'INTERVAL DAY TO SECOND';
+         self.self_type_name := 'any_data_intervalds';
          self.data_value := p_data;
          return;
       end;

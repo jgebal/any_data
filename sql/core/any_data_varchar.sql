@@ -1,4 +1,4 @@
-create or replace type any_data_varchar authid current_user under any_data(
+create or replace type any_data_varchar authid current_user under any_data_family_string(
    data_value varchar(32767),
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_varchar( self in out nocopy any_data_varchar, p_data varchar ) return self as result
@@ -16,6 +16,7 @@ create or replace type body any_data_varchar as
       begin
          self.type_code := dbms_types.typecode_varchar;
          self.type_name := 'VARCHAR';
+         self.self_type_name := 'any_data_varchar';
          self.data_value := p_data;
          return;
       end;
