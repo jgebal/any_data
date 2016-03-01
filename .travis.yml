@@ -29,7 +29,3 @@ install:
 language: ruby
 rvm:
   - 2.3.0
-  - 2.2.4
-  - 1.9.3
-  - jruby-1.7.9
-  - jruby-9.0.4.0
