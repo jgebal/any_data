@@ -16,8 +16,9 @@ shared_examples 'any data constructor for scalar types' do |params|
 end
 
 [
-  { type_code: plsql.dbms_types.typecode_bdouble,  type_name: 'BINARY_DOUBLE', self_type_name: 'any_data_bdouble',  data_value: 123.456789 },
-  { type_code: plsql.dbms_types.typecode_bfloat,   type_name: 'BINARY_FLOAT',  self_type_name: 'any_data_bfloat',   data_value: 123.125 },
+  # Disabled as ruby-plsql 0.5.3 does not support binary_double and binary_float
+  # { type_code: plsql.dbms_types.typecode_bdouble,  type_name: 'BINARY_DOUBLE', self_type_name: 'any_data_bdouble',  data_value: 123.456789 },
+  # { type_code: plsql.dbms_types.typecode_bfloat,   type_name: 'BINARY_FLOAT',  self_type_name: 'any_data_bfloat',   data_value: 123.125 },
   { type_code: plsql.dbms_types.typecode_number,   type_name: 'NUMBER',        self_type_name: 'any_data_number',   data_value: 3 },
   { type_code: plsql.dbms_types.typecode_blob,     type_name: 'BLOB',          self_type_name: 'any_data_blob',     data_value: '1234%$#$%DRGSDFG$#%' },
   { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',      data_value: '1234%$#$%DRGSDFG$#%' },
