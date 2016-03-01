@@ -1,7 +1,7 @@
 # system('sqlplus generic_util/generic_util@xe @sql/uninstall.sql') > nil
 # system('sqlplus generic_util/generic_util@xe @sql/install.sql') > nil
 
-require_relative 'support/execute_sqlplus_file'
+require_relative 'execute_sqlplus_file'
 
 [
   '../../../sql/uninstall.sql',
