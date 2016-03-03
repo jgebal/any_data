@@ -7,7 +7,8 @@ create or replace type any_data authid current_user as object(
    member function get_self_type_name return varchar2,
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ),
    member function get_element( p_position integer ) return any_data,
-   static function compare( p_left any_data, p_right any_data, p_nulls_are_equal varchar2 := 'N' ) return integer,
+   static function compare( p_left any_data, p_right any_data, p_nulls_are_equal boolean ) return integer,
+   static function compare_nulls( p_left any_data, p_right any_data ) return integer,
    member function get_elements_count return integer
 ) not final not instantiable;
 /
@@ -47,7 +48,31 @@ create or replace type body any_data as
          return 1;
       end;
 
-   static function compare( p_left any_data, p_right any_data, p_nulls_are_equal varchar2 := 'N' ) return integer is
+   static function compare_nulls( p_left any_data, p_right any_data ) return integer is
+      v_sql    varchar2(32767);
+      v_result integer;
+      begin
+         v_sql := '
+            declare
+            begin
+               :v_result :=
+                  case
+                     when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value is null
+                     then
+                        case
+                           when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
+                           then 0
+                           else -1
+                        end
+                     when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
+                     then 1
+                  end;
+            end;';
+         execute immediate v_sql using out v_result, p_left, p_right;
+         return v_result;
+      end;
+
+   static function compare( p_left any_data, p_right any_data, p_nulls_are_equal boolean ) return integer is
       v_sql    varchar2(32767);
       v_result integer;
       begin
@@ -65,20 +90,16 @@ create or replace type body any_data as
                      when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value
                         < treat( :p_right as '||p_right.get_self_type_name()||' ).data_value
                      then -1
-                     '||case when upper(p_nulls_are_equal) = 'Y' then
-                    'when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value is null
-                     then
-                        case
-                           when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
-                           then 0
-                           else -1
-                        end
-                     when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
-                     then 1'
-                     end||'
                   end;
             end;';
-         execute immediate v_sql using out v_result, p_left, p_right;
+
+
+         if p_nulls_are_equal then
+            v_result := compare_nulls( p_left, p_right );
+         end if;
+         if v_result is null then
+            execute immediate v_sql using out v_result, p_left, p_right;
+         end if;
          return v_result;
       end;
 

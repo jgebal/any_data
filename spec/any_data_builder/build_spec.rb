@@ -1,4 +1,4 @@
-describe 'Build reportable any data from ANYDATA' do
+describe 'Build any_data object from ANYDATA' do
 
   def return_string_value(anydata)
     sql = <<-SQL
@@ -86,6 +86,7 @@ describe 'Build reportable any data from ANYDATA' do
       { type: 'BINARY_DOUBLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: '1.23456789E+002' },
       { type: 'BINARY_FLOAT', in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: '1.23456001E+002' },
       { type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
+      { type: 'RAW',  in_val: "ANYDATA.ConvertRaw( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
       { type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: "'clob value'" },
       { type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'" },
       { type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: '2015-11-21 20:01:01' },
@@ -96,7 +97,7 @@ describe 'Build reportable any data from ANYDATA' do
       { type: 'VARCHAR', in_val: "ANYDATA.ConvertVarchar( 'Sample varchar' )", expected: "'Sample varchar'" },
       { type: 'VARCHAR2', in_val: "ANYDATA.ConvertVarchar2( 'Sample varchar2' )", expected: "'Sample varchar2'" },
     ].each do |test_case|
-      it "reports a #{test_case[:type]} datatype" do
+      it "converts a #{test_case[:type]} into a string representation" do
         expect(return_string_value test_case[:in_val]).to eq test_case[:expected]
       end
     end
@@ -104,7 +105,7 @@ describe 'Build reportable any data from ANYDATA' do
 
   context 'user defined object type' do
 
-    it 'reports an object type' do
+    it 'converts an object into string representation' do
       test_object="GENERIC_UTIL.DATATYPE_OBJ(
    A01 => 123.456789,
    A02 => 123.456,
@@ -142,7 +143,7 @@ describe 'Build reportable any data from ANYDATA' do
       expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
     end
 
-    it 'reports on object within an object' do
+    it 'converts nested object into string representation' do
       test_object="test_parent_object( 1234, test_obj( 'some characters', 1234567890.12345678901) )"
       expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
    SOME_ID => 1234,
@@ -154,7 +155,7 @@ describe 'Build reportable any data from ANYDATA' do
       expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
     end
 
-    it 'reports on collection within an object' do
+    it 'converts an object containing a collection into string representation' do
       test_col_obj="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', test_col( 1, 2, 3.456, 7.8, 9 ), 1.23 )"
       expected    = "GENERIC_UTIL.TEST_COL_OBJ(
    A_DATE => 2015-11-21 20:01:01,
@@ -176,7 +177,7 @@ describe 'Build reportable any data from ANYDATA' do
   context 'defined collection types' do
 
 
-    it 'reports on collection of primitives' do
+    it 'converts collection of primitives into string representation' do
       test_collection='test_col( 1, 2, 3.456, 7.8, 9 )'
       expected       = 'GENERIC_UTIL.TEST_COL(
    1,
@@ -189,7 +190,7 @@ describe 'Build reportable any data from ANYDATA' do
 
     end
 
-    it 'reports on collection of objects' do
+    it 'converts collection of objects into string representation' do
       test_object    ="test_obj('test',1)"
       test_collection="test_obj_col( #{test_object},#{test_object} )"
       expected       = "GENERIC_UTIL.TEST_OBJ_COL(
@@ -205,7 +206,7 @@ describe 'Build reportable any data from ANYDATA' do
       expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
     end
 
-    it 'reports on collection of collections' do
+    it 'converts collection of collections into string representation' do
       test_collection='test_col_col(test_col( 1, 2, 3.456, 7.8, 9 ), test_col( 4,5,6,7.89 ))'
       expected       = 'GENERIC_UTIL.TEST_COL_COL(
    GENERIC_UTIL.TEST_COL(
@@ -225,7 +226,7 @@ describe 'Build reportable any data from ANYDATA' do
       expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
     end
 
-    it 'reports on collection of objects with collections' do
+    it 'converts collection of objects with collections into string representation' do
       test_collection ='test_col( 1, 2 )'
       test_col_obj    ="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', #{test_collection}, 1.23 )"
       test_col_obj_col="test_col_obj_col( #{test_col_obj}, #{test_col_obj} )"
@@ -256,7 +257,7 @@ describe 'Build reportable any data from ANYDATA' do
 
   context 'sub-typed objects' do
 
-    it 'reports on collection of super-type containing sub-types' do
+    it 'converts collection of super-type containing sub-types into string representation' do
       test_object    ="test_obj('test',1)"
       test_sub_object="test_under_obj('test',1,'description')"
       test_collection="test_obj_col( #{test_object},#{test_sub_object} )"
@@ -274,7 +275,7 @@ describe 'Build reportable any data from ANYDATA' do
       expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
     end
 
-    it 'reports on sub-typed object within an object' do
+    it 'converts sub-typed object within an object' do
       test_object="test_parent_object( 1234, test_under_obj( 'some characters', 1234567890.12345678901, 'description') )"
       expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
    SOME_ID => 1234,
