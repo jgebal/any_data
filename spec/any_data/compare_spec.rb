@@ -101,14 +101,14 @@ describe 'any data compare' do
         {type_name: 'any_data_number',   data_value: 1235.125 },
       ],
       [
-        {type_name: 'any_data_blob',     data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')||utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
+        {type_name: 'any_data_blob',     data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
         {type_name: 'any_data_raw',      data_value: "utl_raw.cast_to_raw('9234%$#$%DRGSDFG$#%')" },
       ],
       [
         {type_name: 'any_data_char',     data_value: "'A char'" },
         {type_name: 'any_data_varchar',  data_value: "'A varchar'" },
         {type_name: 'any_data_varchar2', data_value: "'A varchar2'" },
-        {type_name: 'any_data_clob',     data_value: "'Clob value'||'#{('a'*32767)}'"},
+        {type_name: 'any_data_clob',     data_value: "'Clob value'||'#{('a'*32000)}'"},
       ],
       # [
       #   {type_name: 'any_data_date',     data_value: "TO_DATE('2016-02-25','YYYY-MM-DD')" },
