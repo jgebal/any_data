@@ -23,10 +23,10 @@ end
   # { type_code: plsql.dbms_types.typecode_interval_ds,  type_name: 'INTERVAL DAY TO SECOND', self_type_name: 'any_data_intervalds',  data_value: '12345:23:59:59.123456789' },
   # { type_code: plsql.dbms_types.typecode_interval_ym,  type_name: 'INTERVAL YEAR TO MONTH', self_type_name: 'any_data_intervalym',  data_value: '12345-12' },
   # { type_code: plsql.dbms_types.typecode_bfloat,   type_name: 'BINARY_FLOAT',  self_type_name: 'any_data_bfloat',   data_value: 123.125 },
-  { type_code: plsql.dbms_types.typecode_number,   type_name: 'NUMBER',        self_type_name: 'any_data_number',   data_value: 3 },
-  { type_code: plsql.dbms_types.typecode_blob,     type_name: 'BLOB',          self_type_name: 'any_data_blob',     data_value: "O1AA" },
   # RAW type is not fully supported in ruby-plsql
   # { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',      data_value: "01AB" },
+  { type_code: plsql.dbms_types.typecode_number,   type_name: 'NUMBER',        self_type_name: 'any_data_number',   data_value: 3 },
+  { type_code: plsql.dbms_types.typecode_blob,     type_name: 'BLOB',          self_type_name: 'any_data_blob',     data_value: "O1AA" },
   { type_code: plsql.dbms_types.typecode_char,     type_name: 'CHAR',          self_type_name: 'any_data_char',     data_value: 'A' },
   { type_code: plsql.dbms_types.typecode_varchar,  type_name: 'VARCHAR',       self_type_name: 'any_data_varchar',  data_value: 'Sample varchar' },
   { type_code: plsql.dbms_types.typecode_varchar2, type_name: 'VARCHAR2',      self_type_name: 'any_data_varchar2', data_value: 'Sample varchar2' },

@@ -29,7 +29,8 @@ describe 'Build any_data object from ANYDATA' do
       a12 VARCHAR2(32767),
       a13 CHARACTER VARYING(30) ,
       a14 INT,
-      a15 SMALLINT
+      a15 SMALLINT,
+      a16 RAW(32767)
       )
     SQL
     plsql.execute <<-SQL
@@ -121,7 +122,8 @@ describe 'Build any_data object from ANYDATA' do
    A12 => 'Sample varchar2',
    A13 => 'Sample character varying',
    A14 => 123456789,
-   A15 => 123456789
+   A15 => 123456789,
+   A16 => utl_raw.cast_to_raw('ab')
 )"
       expected   = "GENERIC_UTIL.DATATYPE_OBJ(
    A01 => 1.23456789E+002,
@@ -138,7 +140,8 @@ describe 'Build any_data object from ANYDATA' do
    A12 => 'Sample varchar2',
    A13 => 'Sample character varying',
    A14 => 123456789,
-   A15 => 123456789
+   A15 => 123456789,
+   A16 => 'ab'
 )"
       expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
     end
