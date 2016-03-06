@@ -42,19 +42,21 @@ end
 
 shared_examples 'any data null comparison' do |type, value, null_values|
 
+  include_context 'compare'
+
   context 'NULL values comparison' do
 
     null_values.each do |null_value|
 
-      it "returns -1 if self object holds #{null_value} value" do
+      it "returns NULL if self object holds #{null_value} value" do
         expect(compare(type, null_value, type, value)).to be_nil
       end
 
-      it "returns 1 if compared object holds #{null_value} value" do
+      it "returns NULL if compared object holds #{null_value} value" do
         expect(compare(type, value, type, null_value)).to be_nil
       end
 
-      it "returns 0 if both objects holds #{null_value} value" do
+      it "returns NULL if both objects holds #{null_value} value" do
         expect(compare(type, null_value, type, null_value)).to be_nil
       end
 
@@ -125,6 +127,18 @@ describe 'any data compare' do
       end
 
     end
+  end
+
+  context 'compare types from different families' do
+
+    include_context 'compare'
+
+    it 'returns NULL if objects are from different families' do
+      expect(
+        compare('any_data_number', 1, 'any_data_varchar2', '1')
+      ).to be_nil
+    end
+
   end
 
 end
