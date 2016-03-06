@@ -1,6 +1,6 @@
 create or replace type any_data_family_raw authid current_user under any_data(
    overriding member function get_self_family_name return varchar2,
-   overriding member function compare_non_null( p_left any_data, p_right any_data ) return integer
+   overriding member function compare_internal( p_left any_data, p_right any_data ) return integer
 ) not final not instantiable;
 /
 
@@ -12,7 +12,7 @@ create or replace type body any_data_family_raw is
          return 'any_data_family_raw';
       end;
 
-   overriding member function compare_non_null( p_left any_data, p_right any_data ) return integer is
+   overriding member function compare_internal( p_left any_data, p_right any_data ) return integer is
       v_result integer;
       c_sql  constant varchar2(32767) := '
             declare

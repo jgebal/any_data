@@ -8,9 +8,7 @@ create or replace type any_data authid current_user as object(
    member function get_self_type_name return varchar2,
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ),
    member function get_element( p_position integer ) return any_data,
-   member function compare( p_other any_data, p_nulls_are_equal boolean ) return integer,
-   member function compare_nulls( p_left any_data, p_right any_data ) return integer,
-   member function compare_non_null( p_left any_data, p_right any_data ) return integer,
+   member function compare_internal( p_left any_data, p_right any_data ) return integer,
    order member function compare( p_other any_data ) return integer,
    member function get_elements_count return integer
 ) not final not instantiable;
@@ -51,31 +49,7 @@ create or replace type body any_data as
          return 1;
       end;
 
-   member function compare_nulls( p_left any_data, p_right any_data ) return integer is
-      v_sql    varchar2(32767);
-      v_result integer;
-      begin
-         v_sql := '
-            declare
-            begin
-               :v_result :=
-                  case
-                     when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value is null
-                     then
-                        case
-                           when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
-                           then 0
-                           else -1
-                        end
-                     when treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
-                     then 1
-                  end;
-            end;';
-         execute immediate v_sql using out v_result, p_left, p_right;
-         return v_result;
-      end;
-
-   member function compare_non_null( p_left any_data, p_right any_data ) return integer is
+   member function compare_internal( p_left any_data, p_right any_data ) return integer is
       v_result integer;
       c_sql    constant varchar2(32767) := '
             declare
@@ -98,24 +72,14 @@ create or replace type body any_data as
          return v_result;
       end;
 
-   member function compare( p_other any_data, p_nulls_are_equal boolean ) return integer is
-      v_result integer;
-      begin
-         if p_nulls_are_equal then
-            v_result := compare_nulls( self, p_other );
-         end if;
-         return coalesce( v_result, compare_non_null( self, p_other ) );
-      end;
-
    order member function compare( p_other any_data ) return integer is
       begin
          return
             case
+               when p_other is null
+               then null
                when self.get_self_family_name() = p_other.get_self_family_name()
-               then coalesce(
-                  compare_nulls( self, p_other ),
-                  compare_non_null( self, p_other ) )
-               else -1
+               then compare_internal( self, p_other )
             end;
       end;
 
