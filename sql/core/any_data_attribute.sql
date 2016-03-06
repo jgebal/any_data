@@ -1,12 +1,18 @@
 create or replace type any_data_attribute authid current_user under any_data (
    name varchar2(400),
    data_value any_data,
+   overriding member function get_self_family_name return varchar2,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_attribute( self in out nocopy any_data_attribute, p_data any_data ) return self as result
 );
 /
 
 create or replace type body any_data_attribute is
+
+   overriding member function get_self_family_name return varchar2 is
+      begin
+         return 'any_data_attribute';
+      end;
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       v_result string_array;

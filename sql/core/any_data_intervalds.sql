@@ -1,11 +1,17 @@
 create or replace type any_data_intervalds authid current_user under any_data(
    data_value dsinterval_unconstrained,
+   overriding member function get_self_family_name return varchar2,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_intervalds( self in out nocopy any_data_intervalds, p_data dsinterval_unconstrained ) return self as result
 );
 /
 
 create or replace type body any_data_intervalds as
+
+   overriding member function get_self_family_name return varchar2 is
+      begin
+         return 'any_data_intervalds';
+      end;
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
