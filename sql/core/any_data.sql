@@ -8,7 +8,7 @@ create or replace type any_data authid current_user as object(
    member function get_self_type_name return varchar2,
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ),
    member function get_element( p_position integer ) return any_data,
-   member function compare_internal( p_left any_data, p_right any_data ) return integer,
+   member function compare_internal( p_other any_data ) return integer,
    order member function compare( p_other any_data ) return integer,
    member function get_elements_count return integer
 ) not final not instantiable;
@@ -49,30 +49,33 @@ create or replace type body any_data as
          return 1;
       end;
 
-   member function compare_internal( p_left any_data, p_right any_data ) return integer is
+   member function compare_internal( p_other any_data ) return integer is
       v_result integer;
       c_sql    constant varchar2(32767) := '
             declare
+               function do_compare(
+                  p_self '  || self.get_self_type_name( ) || ',
+                  p_other ' || p_other.get_self_type_name( ) || '
+               ) return integer is
+               begin
+                  return
+                     case
+                        when p_self.data_value = p_other.data_value then 0
+                        when p_self.data_value > p_other.data_value then 1
+                        when p_self.data_value < p_other.data_value then -1
+                        when any_data_const.nulls_are_equal
+                         and p_self.data_value is null and p_other.data_value is null then 0
+                     end;
+               end;
             begin
                :v_result :=
-                  case
-                     when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value
-                        = treat( :p_right as '||p_right.get_self_type_name()||' ).data_value
-                     then 0
-                     when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value
-                        > treat( :p_right as '||p_right.get_self_type_name()||' ).data_value
-                     then 1
-                     when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value
-                        < treat( :p_right as '||p_right.get_self_type_name()||' ).data_value
-                     then -1
-                     when any_data_const.nulls_are_equal
-                      and treat( :p_left as '||p_left.get_self_type_name()||' ).data_value is null
-                      and treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
-                     then 0
-                  end;
+                  do_compare(
+                     treat( :v_self  as ' || self.get_self_type_name( ) || ' ),
+                     treat( :p_other as ' || p_other.get_self_type_name( ) || ' )
+                  );
             end;';
       begin
-         execute immediate c_sql using out v_result, p_left, p_right;
+         execute immediate c_sql using out v_result, self, p_other;
          return v_result;
       end;
 
@@ -83,7 +86,7 @@ create or replace type body any_data as
                when p_other is null
                then null
                when self.get_self_family_name() = p_other.get_self_family_name()
-               then compare_internal( self, p_other )
+               then compare_internal( p_other )
             end;
       end;
 

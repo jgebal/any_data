@@ -2,7 +2,7 @@ create or replace type any_data_attribute authid current_user under any_data (
    name varchar2(400),
    data_value any_data,
    overriding member function get_self_family_name return varchar2,
-   overriding member function compare_internal( p_left any_data, p_right any_data ) return integer,
+   overriding member function compare_internal( p_other any_data ) return integer,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    constructor function any_data_attribute( self in out nocopy any_data_attribute, p_name varchar2, p_data any_data ) return self as result
 );
@@ -15,17 +15,17 @@ create or replace type body any_data_attribute is
          return 'any_data_attribute';
       end;
 
-   overriding member function compare_internal( p_left any_data, p_right any_data ) return integer is
+   overriding member function compare_internal( p_other any_data ) return integer is
       begin
          return
             case
-               when treat(p_left as any_data_attribute).data_value is null
+               when self.data_value is null
                then null
-               when UPPER(treat(p_left as any_data_attribute).name) = UPPER(treat(p_right as any_data_attribute).name)
-               then treat(p_left as any_data_attribute).data_value.compare( treat(p_right as any_data_attribute).data_value )
-               when treat(p_left as any_data_attribute).name > treat(p_right as any_data_attribute).name
+               when UPPER(self.name) = UPPER(treat(p_other as any_data_attribute).name)
+               then self.data_value.compare( treat(p_other as any_data_attribute).data_value )
+               when self.name > treat(p_other as any_data_attribute).name
                then 1
-               when treat(p_left as any_data_attribute).name < treat(p_right as any_data_attribute).name
+               when self.name < treat(p_other as any_data_attribute).name
                then -1
             end;
       end;

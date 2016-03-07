@@ -4,7 +4,8 @@ create or replace type any_data_family_compound authid current_user under any_da
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
    overriding member procedure add_element( self in out nocopy any_data_family_compound, p_attribute any_data ),
    overriding member function get_element( p_position integer ) return any_data,
-   overriding member function get_elements_count return integer
+   overriding member function get_elements_count return integer,
+   member function compare_elements( p_data_values any_data_tab ) return integer
 ) not final not instantiable;
 /
 
@@ -55,6 +56,22 @@ create or replace type body any_data_family_compound as
    overriding member function get_elements_count return integer is
       begin
          return cardinality( data_values );
+      end;
+
+   member function compare_elements( p_data_values any_data_tab ) return integer is
+      v_result integer;
+      v_card   integer := get_elements_count();
+      begin
+         for i in 1 .. v_card loop
+            v_result :=
+            case
+               when any_data_const.nulls_are_equal and data_values(i) is null and p_data_values(i) is null
+               then 0
+               else data_values(i).compare( p_data_values(i) )
+            end;
+            exit when nvl( v_result, -1 ) != 0;
+         end loop;
+         return v_result;
       end;
 
 end;
