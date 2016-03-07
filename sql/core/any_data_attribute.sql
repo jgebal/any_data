@@ -21,7 +21,7 @@ create or replace type body any_data_attribute is
             case
                when treat(p_left as any_data_attribute).data_value is null
                then null
-               when treat(p_left as any_data_attribute).name = treat(p_right as any_data_attribute).name
+               when UPPER(treat(p_left as any_data_attribute).name) = UPPER(treat(p_right as any_data_attribute).name)
                then treat(p_left as any_data_attribute).data_value.compare( treat(p_right as any_data_attribute).data_value )
                when treat(p_left as any_data_attribute).name > treat(p_right as any_data_attribute).name
                then 1

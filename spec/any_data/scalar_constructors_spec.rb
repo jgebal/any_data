@@ -44,7 +44,6 @@ describe 'any_data construction' do
   describe 'any_data_collection' do
 
     it 'creates instance of object using full constructor' do
-
       expected ={
         type_code: plsql.dbms_types.typecode_namedcollection,
         type_name: 'COLLECTION',
@@ -55,7 +54,49 @@ describe 'any_data construction' do
       expect(
         plsql.any_data_collection( expected )
       ).to eq(expected)
+    end
 
+    it 'creates instance of object using data values and type name' do
+      expected ={
+        type_code: 248, #typecode_table
+        type_name: 'SOME_COLLECTION',
+        self_type_name: 'any_data_collection',
+        data_values: plsql.any_data_tab( NULL )
+      }
+
+      expect(
+        plsql.any_data_collection( expected[:type_name], expected[:data_values]  )
+      ).to eq(expected)
+    end
+
+  end
+
+  describe 'any_data_object' do
+
+    it 'creates instance of object using full constructor' do
+      expected ={
+        type_code: plsql.dbms_types.typecode_object,
+        type_name: 'OBJECT',
+        self_type_name: 'any_data_object',
+        data_values: plsql.any_data_tab( NULL )
+      }
+
+      expect(
+        plsql.any_data_object( expected )
+      ).to eq(expected)
+    end
+
+    it 'creates instance of object using data values and type name' do
+      expected ={
+        type_code: plsql.dbms_types.typecode_object,
+        type_name: 'AN_OBJECT',
+        self_type_name: 'any_data_object',
+        data_values: plsql.any_data_tab( NULL )
+      }
+
+      expect(
+        plsql.any_data_object( expected[:type_name], expected[:data_values]  )
+      ).to eq(expected)
     end
 
   end
