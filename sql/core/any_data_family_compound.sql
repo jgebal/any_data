@@ -54,7 +54,7 @@ create or replace type body any_data_family_compound as
 
    overriding member function get_elements_count return integer is
       begin
-         return coalesce( cardinality( data_values ), 0 );
+         return cardinality( data_values );
       end;
 
 end;

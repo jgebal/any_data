@@ -7,7 +7,7 @@ create or replace package body any_data_formatter as
       begin
          if p_string is not null then
             loop
-               v_newline_pos := instr( p_string, new_line, v_start_pos );
+               v_newline_pos := instr( p_string, any_data_const.new_line, v_start_pos );
                exit when v_newline_pos = 0;
                v_result.extend;
                v_result( v_result.last ) := substr( p_string, v_start_pos, v_newline_pos - v_start_pos );
@@ -26,9 +26,9 @@ create or replace package body any_data_formatter as
       begin
          v_lines := split_nl_string_to_array( p_string );
          for i in 1 .. cardinality( v_lines ) loop
-            v_result := v_result || v_indent_string || v_lines( i ) || new_line;
+            v_result := v_result || v_indent_string || v_lines( i ) || any_data_const.new_line;
          end loop;
-         return rtrim( v_result, new_line );
+         return rtrim( v_result, any_data_const.new_line );
       end;
 
    function indent_lines( p_lines string_array, p_times integer := 1 ) return string_array is

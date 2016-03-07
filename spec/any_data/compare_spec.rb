@@ -56,8 +56,8 @@ shared_examples 'any data null comparison' do |type, value, null_values|
         expect(compare(type, value, type, null_value)).to be_nil
       end
 
-      it "returns NULL if both holds #{null_value} value" do
-        expect(compare(type, null_value, type, null_value)).to be_nil
+      it "returns 0 if both holds #{null_value} value" do
+        expect(compare(type, null_value, type, null_value)).to eq 0
       end
 
     end
@@ -299,12 +299,24 @@ describe 'any data compare' do
             'any_data_collection', "'coll', NULL"
           )
         ).to be_nil
+      end
+
+      it 'returns 0 when both collections data is NULL' do
         expect(
           compare(
             'any_data_collection', "'coll', NULL",
             'any_data_collection', "'coll', NULL"
           )
-        ).to be_nil
+        ).to eq 0
+      end
+
+      it 'returns 0 when both collections data is contain NULL elements' do
+        expect(
+          compare(
+            'any_data_collection', "'coll', any_data_tab( null )",
+            'any_data_collection', "'coll', any_data_tab( null )"
+          )
+        ).to eq 0
       end
 
       it 'returns NULL when collections contain data from different families' do

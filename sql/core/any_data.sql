@@ -24,9 +24,9 @@ create or replace type body any_data as
          v_array := to_string_array( );
          v_array_size := cardinality( v_array );
          for i in 1 .. v_array_size  loop
-            v_result := v_result || v_array(i) || any_data_formatter.new_line;
+            v_result := v_result || v_array(i) || any_data_const.new_line;
          end loop;
-         return rtrim( v_result, any_data_formatter.new_line );
+         return rtrim( v_result, any_data_const.new_line );
       end;
 
    member function get_self_type_name return varchar2 is
@@ -65,6 +65,10 @@ create or replace type body any_data as
                      when treat( :p_left as '||p_left.get_self_type_name()||' ).data_value
                         < treat( :p_right as '||p_right.get_self_type_name()||' ).data_value
                      then -1
+                     when any_data_const.nulls_are_equal
+                      and treat( :p_left as '||p_left.get_self_type_name()||' ).data_value is null
+                      and treat( :p_right as '||p_right.get_self_type_name()||' ).data_value is null
+                     then 0
                   end;
             end;';
       begin

@@ -9,7 +9,7 @@ create or replace type body any_data_clob as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
-         return string_array( ''''||replace( to_char( dbms_lob.substr( data_value, any_data_formatter.max_return_data_length ) ) , '''', '''''')||'''' || p_separator );
+         return string_array( ''''||replace( to_char( dbms_lob.substr( data_value, any_data_const.max_return_data_length ) ) , '''', '''''')||'''' || p_separator );
       end;
 
    constructor function any_data_clob( self in out nocopy any_data_clob, p_data clob ) return self as result is

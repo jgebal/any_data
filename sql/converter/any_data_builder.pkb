@@ -8,7 +8,7 @@ create or replace package body any_data_builder as
    c_value    constant varchar2(30) := '{value}';
    c_data     constant varchar2(30) := 'v_data';
    c_indent   constant varchar2(30) := any_data_formatter.indent_string;
-   c_nl       constant varchar2(30) := any_data_formatter.new_line;
+   c_nl       constant varchar2(30) := any_data_const.new_line;
 
    c_sql_block constant varchar2(1000) :=
       'declare'||c_nl||
