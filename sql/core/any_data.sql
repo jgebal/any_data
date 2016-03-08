@@ -60,11 +60,11 @@ create or replace type body any_data as
                begin
                   return
                      case
+                        when any_data_const.nulls_are_equal
+                         and p_self.data_value is null and p_other.data_value is null then 0
                         when p_self.data_value = p_other.data_value then 0
                         when p_self.data_value > p_other.data_value then 1
                         when p_self.data_value < p_other.data_value then -1
-                        when any_data_const.nulls_are_equal
-                         and p_self.data_value is null and p_other.data_value is null then 0
                      end;
                end;
             begin

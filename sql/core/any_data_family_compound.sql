@@ -5,6 +5,7 @@ create or replace type any_data_family_compound authid current_user under any_da
    overriding member procedure add_element( self in out nocopy any_data_family_compound, p_attribute any_data ),
    overriding member function get_element( p_position integer ) return any_data,
    overriding member function get_elements_count return integer,
+   overriding member function compare_internal( p_other any_data ) return integer,
    member function compare_elements( p_data_values any_data_tab ) return integer
 ) not final not instantiable;
 /
@@ -57,6 +58,27 @@ create or replace type body any_data_family_compound as
       begin
          return cardinality( data_values );
       end;
+
+   overriding member function compare_internal( p_other any_data ) return integer is
+      v_result integer;
+      function do_compare( p_other any_data_family_compound ) return integer is
+         begin
+            return
+            case
+            when self.get_elements_count()= p_other.get_elements_count()
+               then self.compare_elements( p_other.data_values )
+            when self.get_elements_count() > p_other.get_elements_count()
+               then 1
+            when self.get_elements_count() < p_other.get_elements_count()
+               then -1
+            when any_data_const.nulls_are_equal
+                 and self.data_values is null and p_other.data_values is null
+               then 0
+            end;
+         end;
+      begin
+         return do_compare( treat( p_other as any_data_family_compound ) );
+      end compare_internal;
 
    member function compare_elements( p_data_values any_data_tab ) return integer is
       v_result integer;

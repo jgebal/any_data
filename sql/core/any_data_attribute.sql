@@ -19,6 +19,8 @@ create or replace type body any_data_attribute is
       begin
          return
             case
+               when any_data_const.nulls_are_equal
+                and self.data_value is null and treat(p_other as any_data_attribute).data_value is null then 0
                when self.data_value is null
                then null
                when UPPER(self.name) = UPPER(treat(p_other as any_data_attribute).name)

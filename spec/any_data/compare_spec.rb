@@ -210,12 +210,15 @@ describe 'any data compare' do
             'any_data_attribute', "'a', NULL"
           )
         ).to be_nil
+      end
+
+      it 'returns 0 when both attributes data is NULL' do
         expect(
           compare(
             'any_data_attribute', "'a', NULL",
             'any_data_attribute', "'a', NULL"
           )
-        ).to be_nil
+        ).to eq 0
       end
 
       it 'returns NULL when attribute contain data from different families' do
@@ -241,7 +244,7 @@ describe 'any data compare' do
         ).to eq 0
       end
 
-      it 'returns 0 for collections regardless of collection type name' do
+      it 'returns 0 for collections containing the same elements regardless of collection type name' do
         expect(
           compare(
             'any_data_collection', "'a_collection',          any_data_tab( any_data_number(2) )",
@@ -340,6 +343,111 @@ describe 'any data compare' do
     end
 
     context 'any_data_object' do
+
+      it 'returns 0 for identical objects' do
+        expect(
+          compare(
+            'any_data_object', "'a_object', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'a_object', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to eq 0
+      end
+
+      it 'returns 0 for objects regardless of object type name' do
+        expect(
+          compare(
+            'any_data_object', "'a_object',          any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'some_other_object', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to eq 0
+      end
+
+      it 'returns 1 of compared object is less' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) , any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to eq 1
+      end
+
+      it 'returns -1 of compared object is greater' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ), any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to eq -1
+      end
+
+      it 'returns 1 if objects are of equal size but compared objects element is less' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(1) ) )"
+          )
+        ).to eq 1
+      end
+
+      it 'returns -1 if objects are of equal size but compared objects element is greater' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(1) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to eq -1
+      end
+
+      it 'returns NULL when one of objects data is NULL' do
+        expect(
+          compare(
+            'any_data_object', "'coll', NULL",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )"
+          )
+        ).to be_nil
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(2) ) )",
+            'any_data_object', "'coll', NULL"
+          )
+        ).to be_nil
+      end
+
+      it 'returns 0 when both objects data is NULL' do
+        expect(
+          compare(
+            'any_data_object', "'coll', NULL",
+            'any_data_object', "'coll', NULL"
+          )
+        ).to eq 0
+      end
+
+      it 'returns 0 when both objects data is contain NULL elements' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', null ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', null ) )"
+          )
+        ).to eq 0
+      end
+
+      it 'returns NULL when objects contain data from different families' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(1) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_varchar2('1') ) )"
+          )
+        ).to be_nil
+      end
+
+      it 'returns 0 when objects contain data from common family' do
+        expect(
+          compare(
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_number(1) ) )",
+            'any_data_object', "'coll', any_data_tab( any_data_attribute('attribute_name', any_data_bfloat(1) ) )"
+          )
+        ).to eq 0
+      end
 
     end
 
