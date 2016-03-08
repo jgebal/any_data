@@ -3,31 +3,33 @@
 
 ## Introduction
 
-Some time ago i've seen a PL/SQL procedure containing 300+ lines of loops for logging complex type (array/objects) input parameters and ~40 lines to "do the job".
-It made me think. Why cant er call a logging framework to log any object as it is?
-Well, in fact we can, but then any object needs to have some sort of to_string method.
-Since we do not get one out of the box from Oracle, the burden of doing it falls on developer.
+Some time ago I've seen a PL/SQL procedure containing 300+ lines of code for logging complex type (array/objects) input parameters and ~40 lines of actual code that represented the business logic.
+It made me think. Why cant one call a logging framework to log any object as it is?
+The thing is, Oracle PL/SQL does not allow passing any data into a logging procedure/function.
+We can achieve this partly, but then all user defined object types needs to have some sort of to_string method.
+This still does not solve it, as PL/SQL does not allow collection types to have methods.
+That seems a bit of an overkill, specially when dealing with legacy projects that already have a set of user defined object types.
 
 That got me thinking about an alternative approach.
-We could make use of ANYDATA and ANYTYPE to inspect the objects and convert them into string (VARCHAR2/CLOB) representation.
-This however has proven to be a challenge bigger than initially considered.
-Anyway, after trying out few different approaches and designs i've ended up with what you get.
-It seems like a pretty decent utility with nice extensibility and flexibility.
+Oracle supplies ANYDATA type that allows almost any data to be passed into a plsql routine.
+Unfortunately, the ANYDATA type is not user (developer) friendly and i guess this is main reason I've never see it in action actually.
 
-Below you'll find quite a few use-case scenarios where you can benefit from using this library.
+This project is making use of ANYDATA and ANYTYPE to inspect the objects and convert them into a set of predefined objects that can be used to achieve quite interesting things.
+
+Use-case scenarios for using the library.
 
 # Sample use cases
 
 ### Logging parameters
 TODO add description and examples
 
-### Comparing different objects data
+### Comparing different data types
 TODO add description and examples
 
 # Supported data types
 
 TODO list all supported datatypes
 
-# Known issues
+# Known issues and limitations
 
 
