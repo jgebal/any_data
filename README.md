@@ -274,8 +274,32 @@ Got: GENERIC_UTIL.EMPLOYEES(
 
 # Supported data types
 
-TODO list all supported datatypes
+* Numeric
+  * BINARY_FLOAT
+  * BINARY_DOUBLE
+  * NUMBER / INTEGER
+* String
+  * CHAR
+  * VARCHAR
+  * VARCHAR2
+  * CLOB
+* Binary
+  * RAW
+  * BLOB
+* Date
+  * DATE
+* INTERVAL YEAR TO MONTH
+* INTERVAL DAY TO SECOND
+* Compound
+  * OBJECT
+  * COLLECTION
+
+
+# Type and data comparison rules
+
+TODO
 
 # Known issues and limitations
 
+TODO
 
