@@ -205,8 +205,72 @@ GENERIC_UTIL.EMPLOYEE(
 )
 ```
 
-### Comparing different data types
-TODO add description and examples
+### Comparing any data
+Given the following user defined types exist
+```sql
+create or replace type department as object(
+   dept_name varchar2(30)
+);
+/
+
+create or replace type employee as object(
+  emp_no    integer,
+  emp_name  varchar2(30),
+  hire_date date,
+  dept      department
+);
+/
+
+create or replace type employees as table of employee;
+/
+
+```
+When I execute the following PL/SQL block
+```sql
+declare
+   chuck employee := employee(1, 'Chuck Norris', date '1960-01-01', department('Texas Rangers'));
+   chucks employees := employees(chuck, chuck);
+   results  any_data := any_data_builder.build( ANYDATA.convertCollection( chucks ) );
+   expected any_data := any_data_builder.build( ANYDATA.convertObject( chuck ) );
+begin
+  if expected.eq( results ) then
+    dbms_output.put_line( 'OK' );
+  else
+    dbms_output.put_line( 'Expected: '||expected.to_string() );
+    dbms_output.put_line( 'Got: '||results.to_string() );
+  end if;
+end;
+/
+```
+Then I get results
+```
+Expected: GENERIC_UTIL.EMPLOYEE(
+   EMP_NO => 1,
+   EMP_NAME => 'Chuck Norris',
+   HIRE_DATE => 1960-01-01 00:00:00,
+   DEPT => GENERIC_UTIL.DEPARTMENT(
+      DEPT_NAME => 'Texas Rangers'
+   )
+)
+Got: GENERIC_UTIL.EMPLOYEES(
+   GENERIC_UTIL.EMPLOYEE(
+      EMP_NO => 1,
+      EMP_NAME => 'Chuck Norris',
+      HIRE_DATE => 1960-01-01 00:00:00,
+      DEPT => GENERIC_UTIL.DEPARTMENT(
+         DEPT_NAME => 'Texas Rangers'
+      )
+   ),
+   GENERIC_UTIL.EMPLOYEE(
+      EMP_NO => 1,
+      EMP_NAME => 'Chuck Norris',
+      HIRE_DATE => 1960-01-01 00:00:00,
+      DEPT => GENERIC_UTIL.DEPARTMENT(
+         DEPT_NAME => 'Texas Rangers'
+      )
+   )
+)
+```
 
 # Supported data types
 
