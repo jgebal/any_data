@@ -20,8 +20,190 @@ Use-case scenarios for using the library.
 
 # Sample use cases
 
-### Logging parameters
-TODO add description and examples
+## Logging parameters
+
+### Printing outputs with to_string
+Given the following user defined types exist
+```sql
+create or replace type department as object(
+   dept_name varchar2(30)
+);
+/
+
+create or replace type employee as object(
+  emp_no    integer,
+  emp_name  varchar2(30),
+  hire_date date,
+  dept      department
+);
+/
+
+create or replace type employees as table of employee;
+/
+
+create or replace type numbers as table of number;
+/
+```
+When I execute the following PL/SQL block
+```sql
+--reporting an object as string
+declare
+   texas_rangers department := department('Texas Rangers');
+begin
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertObject(texas_rangers)
+      ).to_string
+   );
+end;
+/
+```
+Then I get the following string printed on dbms_output
+```
+GENERIC_UTIL.DEPARTMENT(
+   DEPT_NAME => 'Texas Rangers'
+)
+```
+
+When I execute the following PL/SQL block
+```sql
+--reporting a collection of objects as string
+declare
+   texas_rangers department := department('Texas Rangers');
+   chuck employee := employee(1, 'Chuck Norris', date '1960-01-01', texas_rangers);
+   chucks employees := employees(chuck, chuck);
+begin
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertCollection(chucks)
+      ).to_string
+   );
+end;
+/
+```
+Then I get the following string printed on dbms_output
+```
+GENERIC_UTIL.EMPLOYEES(
+   GENERIC_UTIL.EMPLOYEE(
+      EMP_NO => 1,
+      EMP_NAME => 'Chuck Norris',
+      HIRE_DATE => 1960-01-01 00:00:00,
+      DEPT => GENERIC_UTIL.DEPARTMENT(
+         DEPT_NAME => 'Texas Rangers'
+      )
+   ),
+   GENERIC_UTIL.EMPLOYEE(
+      EMP_NO => 1,
+      EMP_NAME => 'Chuck Norris',
+      HIRE_DATE => 1960-01-01 00:00:00,
+      DEPT => GENERIC_UTIL.DEPARTMENT(
+         DEPT_NAME => 'Texas Rangers'
+      )
+   )
+)
+```
+
+When I execute the following PL/SQL block
+```sql
+--reporting a collection of primitives as string
+declare
+   decimals numbers := numbers(1,2,3,4,5);
+   floats   numbers := numbers(1.2,0.1234567890123456789012345678912345678901);
+begin
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertCollection(decimals)
+      ).to_string
+   );
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertCollection(floats)
+      ).to_string
+   );
+end;
+/
+```
+Then I get the following string printed on dbms_output
+```
+GENERIC_UTIL.NUMBERS(
+   1,
+   2,
+   3,
+   4,
+   5
+)
+GENERIC_UTIL.NUMBERS(
+   1.2,
+   .1234567890123456789012345678912345678901
+)
+```
+When I execute the following PL/SQL block
+```sql
+--reporting a primitive (not really useful, but still available...)
+declare
+   a_number number := 1;
+   a_string varchar2(30) := 'a string';
+begin
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertNumber(a_number)
+      ).to_string
+   );
+   dbms_output.put_line(
+      any_data_builder.build(
+         ANYDATA.convertVarchar2(a_string)
+      ).to_string
+   );
+end;
+/
+```
+Then I get the following string printed on dbms_output
+```
+1
+'a string'
+```
+
+### Selecting outputs with to_string_array
+Given the following user defined types exist
+```sql
+create or replace type department as object(
+   dept_name varchar2(30)
+);
+/
+
+create or replace type employee as object(
+  emp_no    integer,
+  emp_name  varchar2(30),
+  hire_date date,
+  dept      department
+);
+/
+
+```
+When I execute the following SQL statement
+```sql
+select *
+  from table(
+         any_data_builder.build(
+            ANYDATA.convertObject(
+               employee( 1, 'Chuck Norris', date '1960-01-01', department('Texas Rangers') )
+            )
+         ).to_string_array()
+      )
+;
+```
+Then I get result set is rows
+```
+COLUMN_VALUE
+GENERIC_UTIL.EMPLOYEE(
+   EMP_NO => 1,
+   EMP_NAME => 'Chuck Norris',
+   HIRE_DATE => 1960-01-01 00:00:00,
+   DEPT => GENERIC_UTIL.DEPARTMENT(
+      DEPT_NAME => 'Texas Rangers'
+   )
+)
+```
 
 ### Comparing different data types
 TODO add description and examples
