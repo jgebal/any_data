@@ -1,0 +1,387 @@
+
+any data compare
+  identical scalar types
+    any_data_bdouble
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_bfloat
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_number
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_blob
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_raw
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_clob
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_char
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_varchar
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_varchar2
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+    any_data_date
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+      NULL values comparison
+        returns NULL if self holds NULL value
+        returns NULL if compared holds NULL value
+        returns 0 if both holds NULL value
+  scalar types from the same family
+    compares ANY_DATA_BDOUBLE with ANY_DATA_BFLOAT
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_BDOUBLE with ANY_DATA_NUMBER
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_BFLOAT with ANY_DATA_BDOUBLE
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_BFLOAT with ANY_DATA_NUMBER
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_NUMBER with ANY_DATA_BDOUBLE
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_NUMBER with ANY_DATA_BFLOAT
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_BLOB with ANY_DATA_RAW
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_RAW with ANY_DATA_BLOB
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CHAR with ANY_DATA_VARCHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CHAR with ANY_DATA_VARCHAR2
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CHAR with ANY_DATA_CLOB
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR with ANY_DATA_CHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR with ANY_DATA_VARCHAR2
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR with ANY_DATA_CLOB
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR2 with ANY_DATA_CHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR2 with ANY_DATA_VARCHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_VARCHAR2 with ANY_DATA_CLOB
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CLOB with ANY_DATA_CHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CLOB with ANY_DATA_VARCHAR
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+    compares ANY_DATA_CLOB with ANY_DATA_VARCHAR2
+      non null values comparison
+        returns 0 if both hold equal values
+        returns -1 if self value is bigger
+        returns 1 if compared value is bigger
+  scalar types from different families
+    returns NULL if data is of different families
+  complex types
+    any_data_attribute
+      returns 0 for identical attributes
+      returns 0 regardless of attribute name case
+      returns 1 for attribute name greater than compared
+      returns -1 for attribute name less than compared
+      returns 1 if attribute data is less
+      returns -1 if attribute data is greater
+      returns NULL when one of attributes data is NULL
+      returns 0 when both attributes data is NULL
+      returns NULL when attribute contain data from different families
+    any_data_collection
+      returns 0 for identical collections
+      returns 0 for collections containing the same elements regardless of collection type name
+      returns 1 of compared collection is less
+      returns -1 of compared collection is greater
+      returns 1 if collections are of equal size but compared collections element is less
+      returns -1 if collections are of equal size but compared collections element is greater
+      returns NULL when one of collections data is NULL
+      returns 0 when both collections data is NULL
+      returns 0 when both collections data is contain NULL elements
+      returns NULL when collections contain data from different families
+      returns 0 when collections contain data from common family
+    any_data_object
+      returns 0 for identical objects
+      returns 0 for objects regardless of object type name
+      returns 1 of compared object is less
+      returns -1 of compared object is greater
+      returns 1 if objects are of equal size but compared objects element is less
+      returns -1 if objects are of equal size but compared objects element is greater
+      returns NULL when one of objects data is NULL
+      returns 0 when both objects data is NULL
+      returns 0 when both objects data is contain NULL elements
+      returns NULL when objects contain data from different families
+      returns 0 when objects contain data from common family
+
+any data equality comparison
+  using equals method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using eq method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using "= " method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+
+any data greater equal to comparison
+  using greater_equal_to method
+    returns true for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using ge method
+    returns true for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using ">=" method
+    returns true for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+
+any data greater than comparison
+  using greater_than method
+    returns false for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using gt method
+    returns false for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+  using "> " method
+    returns false for identical data
+    returns true for when comparing to lesser value
+    returns false for when comparing to greater value
+    returns false for data types of different families
+
+any data less equal to comparison
+  using less_equal_to method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+  using le method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+  using "<=" method
+    returns true for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+
+any data less than comparison
+  using less_than method
+    returns false for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+  using lt method
+    returns false for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+  using "< " method
+    returns false for identical data
+    returns false for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+
+any_data construction
+  any_data_number
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_blob
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_char
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_varchar
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_varchar2
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_clob
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_date
+    creates instance of object using full constructor
+    creates instance of object using data value only
+  any_data_collection
+    creates instance of object using full constructor
+    creates instance of object using data values and type name
+  any_data_object
+    creates instance of object using full constructor
+    creates instance of object using data values and type name
+
+Build any_data object from ANYDATA
+  build-in Oracle scalar types
+    converts a BINARY_DOUBLE into a string representation
+    converts a BINARY_FLOAT into a string representation
+    converts a BLOB into a string representation
+    converts a RAW into a string representation
+    converts a CLOB into a string representation
+    converts a CHAR into a string representation
+    converts a DATE into a string representation
+    converts a INTEGER into a string representation
+    converts a INTERVAL DAY TO SECOND into a string representation
+    converts a INTERVAL YEAR TO MONTH into a string representation
+    converts a NUMBER into a string representation
+    converts a VARCHAR into a string representation
+    converts a VARCHAR2 into a string representation
+  user defined object type
+    converts an object into string representation
+    converts nested object into string representation
+    converts an object containing a collection into string representation
+  defined collection types
+    converts collection of primitives into string representation
+    converts collection of objects into string representation
+    converts collection of collections into string representation
+    converts collection of objects with collections into string representation
+  sub-typed objects
+    converts collection of super-type containing sub-types into string representation
+    converts sub-typed object within an object
+
+Indent lines in a string
+  returns a single line string indented
+  returns NULL for NULL input
+  returns a string with lines indented
+
+Indent elements of an array
+  returns a single line string indented
+  returns NULL for NULL input
+  returns a string with lines indented
+
+Finished in 4.22 seconds (files took 5.56 seconds to load)
+258 examples, 0 failures
+
