@@ -8,9 +8,19 @@ create or replace type any_data authid current_user as object(
    member function get_self_type_name return varchar2,
    member procedure add_element( self in out nocopy any_data, p_attribute any_data ),
    member function get_element( p_position integer ) return any_data,
+   member function get_elements_count return integer,
    member function compare_internal( p_other any_data ) return integer,
    order member function compare( p_other any_data ) return integer,
-   member function get_elements_count return integer
+   member function equals( p_other any_data ) return boolean,
+   member function eq( p_other any_data ) return boolean,
+   member function greater_than( p_other any_data ) return boolean,
+   member function gt( p_other any_data ) return boolean,
+   member function less_than( p_other any_data ) return boolean,
+   member function lt( p_other any_data ) return boolean,
+   member function greater_equal_to( p_other any_data ) return boolean,
+   member function ge( p_other any_data ) return boolean,
+   member function less_equal_to( p_other any_data ) return boolean,
+   member function le( p_other any_data ) return boolean
 ) not final not instantiable;
 /
 
@@ -88,6 +98,56 @@ create or replace type body any_data as
                when self.get_self_family_name() = p_other.get_self_family_name()
                then compare_internal( p_other )
             end;
+      end;
+
+   member function equals( p_other any_data ) return boolean is
+      begin
+         return compare( p_other ) = 0;
+      end;
+
+   member function eq( p_other any_data ) return boolean is
+      begin
+         return equals( p_other );
+      end;
+
+   member function greater_than( p_other any_data ) return boolean is
+      begin
+         return compare( p_other ) > 0;
+      end;
+
+   member function gt( p_other any_data ) return boolean is
+      begin
+         return greater_than( p_other );
+      end;
+
+   member function less_than( p_other any_data ) return boolean is
+      begin
+         return compare( p_other ) < 0;
+      end;
+
+   member function lt( p_other any_data ) return boolean is
+      begin
+         return less_than( p_other );
+      end;
+
+   member function greater_equal_to( p_other any_data ) return boolean is
+      begin
+         return compare( p_other ) >= 0;
+      end;
+
+   member function ge( p_other any_data ) return boolean is
+      begin
+         return greater_equal_to( p_other );
+      end;
+
+   member function less_equal_to( p_other any_data ) return boolean is
+      begin
+         return compare( p_other ) <= 0;
+      end;
+
+   member function le( p_other any_data ) return boolean is
+      begin
+         return less_equal_to( p_other );
       end;
 
 end;
