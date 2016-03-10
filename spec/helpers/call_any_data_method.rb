@@ -9,7 +9,7 @@ def any_data_method(method, type, value, other_type, other_value)
   SQL
   cursor = plsql.connection.parse(sql).bind_param(":x", nil, :data_type => 'NUMBER', :in_out => 'OUT')
   cursor.exec
-  result = cursor[":x"]==nil ? nil : cursor[":x"]==1
+  result = cursor[":x"].nil? ? nil : cursor[":x"]==1
   cursor.close
   result
 end
