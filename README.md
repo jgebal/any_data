@@ -87,7 +87,7 @@ GENERIC_UTIL.EMPLOYEES(
    GENERIC_UTIL.EMPLOYEE(
       EMP_NO => 1,
       EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => 1960-01-01 00:00:00,
+      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
       DEPT => GENERIC_UTIL.DEPARTMENT(
          DEPT_NAME => 'Texas Rangers'
       )
@@ -95,7 +95,7 @@ GENERIC_UTIL.EMPLOYEES(
    GENERIC_UTIL.EMPLOYEE(
       EMP_NO => 1,
       EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => 1960-01-01 00:00:00,
+      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
       DEPT => GENERIC_UTIL.DEPARTMENT(
          DEPT_NAME => 'Texas Rangers'
       )
@@ -198,7 +198,7 @@ COLUMN_VALUE
 GENERIC_UTIL.EMPLOYEE(
    EMP_NO => 1,
    EMP_NAME => 'Chuck Norris',
-   HIRE_DATE => 1960-01-01 00:00:00,
+   HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
    DEPT => GENERIC_UTIL.DEPARTMENT(
       DEPT_NAME => 'Texas Rangers'
    )
@@ -247,7 +247,7 @@ Then I get results
 Expected: GENERIC_UTIL.EMPLOYEE(
    EMP_NO => 1,
    EMP_NAME => 'Chuck Norris',
-   HIRE_DATE => 1960-01-01 00:00:00,
+   HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
    DEPT => GENERIC_UTIL.DEPARTMENT(
       DEPT_NAME => 'Texas Rangers'
    )
@@ -256,7 +256,7 @@ Got: GENERIC_UTIL.EMPLOYEES(
    GENERIC_UTIL.EMPLOYEE(
       EMP_NO => 1,
       EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => 1960-01-01 00:00:00,
+      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
       DEPT => GENERIC_UTIL.DEPARTMENT(
          DEPT_NAME => 'Texas Rangers'
       )
@@ -264,7 +264,7 @@ Got: GENERIC_UTIL.EMPLOYEES(
    GENERIC_UTIL.EMPLOYEE(
       EMP_NO => 1,
       EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => 1960-01-01 00:00:00,
+      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
       DEPT => GENERIC_UTIL.DEPARTMENT(
          DEPT_NAME => 'Texas Rangers'
       )

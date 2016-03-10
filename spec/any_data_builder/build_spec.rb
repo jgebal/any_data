@@ -90,7 +90,7 @@ describe 'Build any_data object from ANYDATA' do
       { type: 'RAW',  in_val: "ANYDATA.ConvertRaw( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
       { type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: "'clob value'" },
       { type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'" },
-      { type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: '2015-11-21 20:01:01' },
+      { type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: "to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' )" },
       { type: 'INTEGER', in_val: 'ANYDATA.ConvertNumber( CAST(1 AS INTEGER) )', expected: '1' },
       { type: 'INTERVAL DAY TO SECOND', in_val: "ANYDATA.ConvertIntervalDS( INTERVAL '123456789 23:59:59.123456789' DAY TO SECOND )", expected: '+123456789 23:59:59.123456789' },
       { type: 'INTERVAL YEAR TO MONTH', in_val: "ANYDATA.ConvertIntervalYM( INTERVAL '123456789-11' YEAR TO MONTH )", expected: '+123456789-11' },
@@ -131,7 +131,7 @@ describe 'Build any_data object from ANYDATA' do
    A03 => '1234%$#$%DRGSDFG$#%',
    A04 => 'clob value',
    A05 => 'Y',
-   A06 => 2015-11-21 20:01:01,
+   A06 => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
    A07 => 1,
    A08 => +123456789 23:59:59.123456789,
    A09 => +123456789-11,
@@ -161,7 +161,7 @@ describe 'Build any_data object from ANYDATA' do
     it 'converts an object containing a collection into string representation' do
       test_col_obj="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', test_col( 1, 2, 3.456, 7.8, 9 ), 1.23 )"
       expected    = "GENERIC_UTIL.TEST_COL_OBJ(
-   A_DATE => 2015-11-21 20:01:01,
+   A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
    A_CHAR => 'some characters',
    A_COL => GENERIC_UTIL.TEST_COL(
       1,
@@ -235,7 +235,7 @@ describe 'Build any_data object from ANYDATA' do
       test_col_obj_col="test_col_obj_col( #{test_col_obj}, #{test_col_obj} )"
       expected        = "GENERIC_UTIL.TEST_COL_OBJ_COL(
    GENERIC_UTIL.TEST_COL_OBJ(
-      A_DATE => 2015-11-21 20:01:01,
+      A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
       A_CHAR => 'some characters',
       A_COL => GENERIC_UTIL.TEST_COL(
          1,
@@ -244,7 +244,7 @@ describe 'Build any_data object from ANYDATA' do
       A_NUM2 => 1.23
    ),
    GENERIC_UTIL.TEST_COL_OBJ(
-      A_DATE => 2015-11-21 20:01:01,
+      A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
       A_CHAR => 'some characters',
       A_COL => GENERIC_UTIL.TEST_COL(
          1,

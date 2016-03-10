@@ -9,7 +9,13 @@ create or replace type body any_data_date as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
-         return string_array( to_char( data_value, 'yyyy-mm-dd hh24:mi:ss' ) || p_separator );
+         return
+            string_array(
+               q'[to_date( ']'
+                  || to_char( data_value, 'yyyy-mm-dd hh24:mi:ss' )
+                  || q'[', 'yyyy-mm-dd hh24:mi:ss' )]'
+                  || p_separator
+            );
       end;
 
    constructor function any_data_date( self in out nocopy any_data_date, p_data date ) return self as result is
