@@ -1,5 +1,5 @@
 # any_data - Making real use case from Oracle ANYDATA
-[![Build Status](https://travis-ci.org/jgebal/anydata_reporter.svg?branch=master)](https://travis-ci.org/jgebal/anydata_reporter)
+[![Build Status](https://travis-ci.org/jgebal/any_data.svg?branch=master)](https://travis-ci.org/jgebal/any_data)
 
 ## Introduction
 
