@@ -1,3 +1,4 @@
+Running specs from -fd
 
 any data compare
   identical scalar types
@@ -233,87 +234,140 @@ any data compare
 any data equality comparison
   using equals method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using eq method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using "= " method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
+
+any data non equality comparison
+  using not_equals method
+    returns false for identical data
+    returns false when comparing NULL to NULL
+    returns true for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+    returns false when comparing to a NULL value
+  using neq method
+    returns false for identical data
+    returns false when comparing NULL to NULL
+    returns true for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+    returns false when comparing to a NULL value
+  using "!=" method
+    returns false for identical data
+    returns false when comparing NULL to NULL
+    returns true for when comparing to lesser value
+    returns true for when comparing to greater value
+    returns false for data types of different families
+    returns false when comparing to a NULL value
 
 any data greater equal to comparison
   using greater_equal_to method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using ge method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using ">=" method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
 
 any data greater than comparison
   using greater_than method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using gt method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using "> " method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns true for when comparing to lesser value
     returns false for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
 
 any data less equal to comparison
   using less_equal_to method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using le method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using "<=" method
     returns true for identical data
+    returns true when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
 
 any data less than comparison
   using less_than method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using lt method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
   using "< " method
     returns false for identical data
+    returns false when comparing NULL to NULL
     returns false for when comparing to lesser value
     returns true for when comparing to greater value
     returns false for data types of different families
+    returns false when comparing to a NULL value
 
 any_data construction
   any_data_number
@@ -382,6 +436,7 @@ Indent elements of an array
   returns NULL for NULL input
   returns a string with lines indented
 
-Finished in 4.22 seconds (files took 5.56 seconds to load)
-258 examples, 0 failures
+Finished in 4.55 seconds (files took 5.74 seconds to load)
+306 examples, 0 failures
 
+Coverage report in coverage/index.html
