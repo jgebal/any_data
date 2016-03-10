@@ -116,7 +116,7 @@ create or replace type body any_data as
 
    final member function not_equals( p_other any_data ) return boolean is
       begin
-         return not equals( p_other );
+         return coalesce( compare( p_other ) != 0, false );
       end;
 
    member function greater_than( p_other any_data ) return boolean is
@@ -151,12 +151,12 @@ create or replace type body any_data as
 
    final member function neq( p_other any_data ) return boolean is
       begin
-         return not equals( p_other );
+         return not_equals( p_other );
       end;
 
    final member function "!="( p_other any_data ) return boolean is
       begin
-         return not equals( p_other );
+         return not_equals( p_other );
       end;
 
    final member function "<>"( p_other any_data ) return boolean is

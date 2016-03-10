@@ -1,4 +1,6 @@
 def any_data_method(method, type, value, other_type, other_value)
+  value = value || 'NULL'
+  other_value = other_value || 'NULL'
   sql = <<-SQL
       DECLARE
          result boolean;
