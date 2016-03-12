@@ -2,6 +2,7 @@ create or replace type any_data authid current_user as object(
    type_code      number(38, 0),
    type_name      varchar2(100),
    self_type_name varchar2(100),
+static function get_version return varchar2,
 final member function to_string return varchar2,
 not instantiable member function to_string_array( p_separator varchar2 := null ) return string_array,
 not instantiable member function get_self_family_name return varchar2,
@@ -34,6 +35,11 @@ final member function "<="( p_other any_data ) return boolean
 /
 
 create or replace type body any_data as
+
+   static function get_version return varchar2 is
+      begin
+         return '&&VERSION';
+      end;
 
    final member function to_string return varchar2 is
       v_array string_array;
