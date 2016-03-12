@@ -23,7 +23,9 @@ Use-case scenarios for using the library.
 ## Logging parameters
 
 ### Printing outputs with to_string
-Given the following user defined types exist
+Given: I'm connected as user `generic_util`
+
+And: the following user defined types exist
 ```sql
 create or replace type department as object(
    dept_name varchar2(30)
@@ -44,7 +46,7 @@ create or replace type employees as table of employee;
 create or replace type numbers as table of number;
 /
 ```
-When I execute the following PL/SQL block
+When: I execute the following PL/SQL block
 ```sql
 --reporting an object as string
 declare
@@ -58,14 +60,14 @@ begin
 end;
 /
 ```
-Then I get the following string printed on dbms_output
+Then: I get the following string printed on dbms_output
 ```
-GENERIC_UTIL.DEPARTMENT(
-   DEPT_NAME => 'Texas Rangers'
+generic_util.department(
+   dept_name => 'Texas Rangers'
 )
 ```
 
-When I execute the following PL/SQL block
+When: I execute the following PL/SQL block
 ```sql
 --reporting a collection of objects as string
 declare
@@ -81,29 +83,29 @@ begin
 end;
 /
 ```
-Then I get the following string printed on dbms_output
+Then: I get the following string printed on dbms_output
 ```
-GENERIC_UTIL.EMPLOYEES(
-   GENERIC_UTIL.EMPLOYEE(
-      EMP_NO => 1,
-      EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-      DEPT => GENERIC_UTIL.DEPARTMENT(
-         DEPT_NAME => 'Texas Rangers'
+generic_util.employees(
+   generic_util.employee(
+      emp_no => 1,
+      emp_name => 'Chuck Norris',
+      hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+      dept => generic_util.department(
+         dept_name => 'Texas Rangers'
       )
    ),
-   GENERIC_UTIL.EMPLOYEE(
-      EMP_NO => 1,
-      EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-      DEPT => GENERIC_UTIL.DEPARTMENT(
-         DEPT_NAME => 'Texas Rangers'
+   generic_util.employee(
+      emp_no => 1,
+      emp_name => 'Chuck Norris',
+      hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+      dept => generic_util.department(
+         dept_name => 'Texas Rangers'
       )
    )
 )
 ```
 
-When I execute the following PL/SQL block
+When: I execute the following PL/SQL block
 ```sql
 --reporting a collection of primitives as string
 declare
@@ -123,21 +125,21 @@ begin
 end;
 /
 ```
-Then I get the following string printed on dbms_output
+Then: I get the following string printed on dbms_output
 ```
-GENERIC_UTIL.NUMBERS(
+generic_util.numbers(
    1,
    2,
    3,
    4,
    5
 )
-GENERIC_UTIL.NUMBERS(
+generic_util.numbers(
    1.2,
    .1234567890123456789012345678912345678901
 )
 ```
-When I execute the following PL/SQL block
+When: I execute the following PL/SQL block
 ```sql
 --reporting a primitive (not really useful, but still available...)
 declare
@@ -157,14 +159,16 @@ begin
 end;
 /
 ```
-Then I get the following string printed on dbms_output
+Then: I get the following string printed on dbms_output
 ```
 1
 'a string'
 ```
 
 ### Selecting outputs with to_string_array
-Given the following user defined types exist
+Given: I'm connected as user `generic_util`
+
+And: the following user defined types exist
 ```sql
 create or replace type department as object(
    dept_name varchar2(30)
@@ -180,7 +184,7 @@ create or replace type employee as object(
 /
 
 ```
-When I execute the following SQL statement
+When: I execute the following SQL statement
 ```sql
 select *
   from table(
@@ -192,21 +196,23 @@ select *
       )
 ;
 ```
-Then I get result set is rows
+Then: I get result set is rows
 ```
 COLUMN_VALUE
-GENERIC_UTIL.EMPLOYEE(
-   EMP_NO => 1,
-   EMP_NAME => 'Chuck Norris',
-   HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-   DEPT => GENERIC_UTIL.DEPARTMENT(
-      DEPT_NAME => 'Texas Rangers'
+generic_util.employee(
+   emp_no => 1,
+   emp_name => 'Chuck Norris',
+   hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+   dept => generic_util.department(
+      dept_name => 'Texas Rangers'
    )
 )
 ```
 
 ### Comparing any data
-Given the following user defined types exist
+Given: I'm connected as user `generic_util`
+
+And: the following user defined types exist
 ```sql
 create or replace type department as object(
    dept_name varchar2(30)
@@ -225,7 +231,7 @@ create or replace type employees as table of employee;
 /
 
 ```
-When I execute the following PL/SQL block
+When: I execute the following PL/SQL block
 ```sql
 declare
    chuck employee := employee(1, 'Chuck Norris', date '1960-01-01', department('Texas Rangers'));
@@ -242,31 +248,31 @@ begin
 end;
 /
 ```
-Then I get results
+Then: I get results
 ```
-Expected: GENERIC_UTIL.EMPLOYEE(
-   EMP_NO => 1,
-   EMP_NAME => 'Chuck Norris',
-   HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-   DEPT => GENERIC_UTIL.DEPARTMENT(
-      DEPT_NAME => 'Texas Rangers'
+Expected: generic_util.employee(
+   emp_no => 1,
+   emp_name => 'Chuck Norris',
+   hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+   dept => generic_util.department(
+      dept_name => 'Texas Rangers'
    )
 )
-Got: GENERIC_UTIL.EMPLOYEES(
-   GENERIC_UTIL.EMPLOYEE(
-      EMP_NO => 1,
-      EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-      DEPT => GENERIC_UTIL.DEPARTMENT(
-         DEPT_NAME => 'Texas Rangers'
+Got: generic_util.employees(
+   generic_util.employee(
+      emp_no => 1,
+      emp_name => 'Chuck Norris',
+      hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+      dept => generic_util.department(
+         dept_name => 'Texas Rangers'
       )
    ),
-   GENERIC_UTIL.EMPLOYEE(
-      EMP_NO => 1,
-      EMP_NAME => 'Chuck Norris',
-      HIRE_DATE => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
-      DEPT => GENERIC_UTIL.DEPARTMENT(
-         DEPT_NAME => 'Texas Rangers'
+   generic_util.employee(
+      emp_no => 1,
+      emp_name => 'Chuck Norris',
+      hire_date => to_date( '1960-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss' ),
+      dept => generic_util.department(
+         dept_name => 'Texas Rangers'
       )
    )
 )
@@ -296,6 +302,14 @@ Got: GENERIC_UTIL.EMPLOYEES(
 
 
 # Type and data comparison rules
+
+TODO
+
+# Comparators
+
+TODO
+
+# Why it's differrent
 
 TODO
 
