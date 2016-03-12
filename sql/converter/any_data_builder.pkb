@@ -28,6 +28,11 @@ create or replace package body any_data_builder as
       c_code||c_nl||
       'end;';
 
+   function get_version return varchar2 is
+      begin
+         return '&&VERSION';
+      end;
+
    function indent_lines( p_string varchar2, p_times integer := 1 ) return varchar2 is
       begin
         return any_data_formatter.indent_lines( p_string, p_times );

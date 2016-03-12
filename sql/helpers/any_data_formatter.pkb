@@ -1,5 +1,10 @@
 create or replace package body any_data_formatter as
 
+   function get_version return varchar2 is
+      begin
+         return '&&VERSION';
+      end;
+
    function split_nl_string_to_array( p_string varchar2 ) return string_array is
       v_result      string_array := string_array( );
       v_start_pos   binary_integer := 1;

@@ -14,6 +14,7 @@ create or replace type any_type_mapper as object (
    attributes_count   number,
    constructor function any_type_mapper ( self in out nocopy any_type_mapper, p_value anydata ) return self as result,
    constructor function any_type_mapper (  self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result,
+   static function get_version return varchar2,
    member function get_type return varchar2,
    member function get_typename return varchar2,
    member function get_attribute_type( p_child_position integer := null ) return any_type_mapper,
@@ -27,6 +28,11 @@ create or replace type any_type_mapper as object (
 /
 
 create or replace type body any_type_mapper is
+
+   static function get_version return varchar2 is
+      begin
+         return '&&VERSION';
+      end;
 
    member function get_attribute_type( p_child_position integer := null ) return any_type_mapper is
       begin
