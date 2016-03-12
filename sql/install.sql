@@ -1,4 +1,4 @@
-@VERSION.sql
+@@./VERSION.sql
 alter session set plsql_optimize_level = 3;
 @@sql/helpers/string_array.sql
 @@sql/helpers/any_data_const.pks
