@@ -10,7 +10,7 @@ shared_examples 'any data constructor for scalar types' do |params|
   end
 
   it 'creates instance of object using data value only' do
-    result = plsql.plsql.send(object_type, expected[:data_value])
+    result = plsql.send(object_type, expected[:data_value])
     expect(result).to eq(expected)
   end
 
