@@ -120,25 +120,21 @@ create or replace package body any_data_builder as
          return v_sql;
       end;
 
-   function get_conversion_sql( p_type any_type_mapper ) return varchar2 is
-      v_sql varchar2(32767) := c_outer_sql_block;
+   function get_conversion_sql( p_any_data anydata ) return varchar2 is
+      v_sql  varchar2(32767) := c_outer_sql_block;
+      v_type any_type_mapper := any_type_mapper( p_any_data );
       begin
-         v_sql := replace( v_sql, c_type_def, p_type.get_type( ) );
-         v_sql := replace( v_sql, c_getter, p_type.get_anydata_getter( ) );
-         v_sql := replace( v_sql, c_code, indent_lines( build_sql( p_type, c_data ) ) );
+         v_sql := replace( v_sql, c_type_def, v_type.get_type( ) );
+         v_sql := replace( v_sql, c_getter, v_type.get_anydata_getter( ) );
+         v_sql := replace( v_sql, c_code, indent_lines( build_sql( v_type, c_data ) ) );
          return v_sql;
       end;
 
-   function build( p_any_data anydata, p_any_type any_type_mapper ) return any_data is
+   function build( p_any_data anydata ) return any_data is
       v_result any_data;
       begin
-         execute immediate get_conversion_sql( p_any_type ) using in p_any_data, out v_result;
+         execute immediate get_conversion_sql( p_any_data ) using in p_any_data, out v_result;
          return v_result;
-      end;
-
-   function build( p_any_data anydata ) return any_data is
-      begin
-         return build( p_any_data, any_type_mapper( p_any_data ) );
       end;
 
 end;
