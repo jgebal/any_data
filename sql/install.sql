@@ -1,4 +1,6 @@
 @@./VERSION.sql
+set verify off
+prompt installing any_data library VERSION &&VERSION
 alter session set plsql_optimize_level = 3;
 @@sql/helpers/string_array.sql
 @@sql/helpers/any_data_const.pks
