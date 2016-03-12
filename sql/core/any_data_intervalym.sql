@@ -15,7 +15,7 @@ create or replace type body any_data_intervalym as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
-         return string_array( to_char( data_value ) || p_separator );
+         return string_array( 'interval ''' || to_char( data_value ) || ''' year to month' || p_separator );
       end;
 
    /* Alternative implementation using 'unconstrained' data type workaround

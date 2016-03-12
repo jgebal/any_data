@@ -1,4 +1,4 @@
-describe 'Build any_data object from ANYDATA' do
+describe 'Build any_data object from anydata' do
 
   def return_string_value(anydata)
     sql = <<-SQL
@@ -84,19 +84,19 @@ describe 'Build any_data object from ANYDATA' do
   context 'build-in Oracle scalar types' do
 
     [
-      { type: 'BINARY_DOUBLE', in_val: 'ANYDATA.ConvertBDouble(123.456789)', expected: '1.23456789E+002' },
-      { type: 'BINARY_FLOAT', in_val: 'ANYDATA.ConvertBFloat(123.456)', expected: '1.23456001E+002' },
-      { type: 'BLOB', in_val: "ANYDATA.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
-      { type: 'RAW',  in_val: "ANYDATA.ConvertRaw( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
-      { type: 'CLOB', in_val: "ANYDATA.ConvertClob('clob value')", expected: "'clob value'" },
-      { type: 'CHAR', in_val: "ANYDATA.ConvertChar( 'A' )", expected: "'A'" },
-      { type: 'DATE', in_val: "ANYDATA.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: "to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' )" },
-      { type: 'INTEGER', in_val: 'ANYDATA.ConvertNumber( CAST(1 AS INTEGER) )', expected: '1' },
-      { type: 'INTERVAL DAY TO SECOND', in_val: "ANYDATA.ConvertIntervalDS( INTERVAL '123456789 23:59:59.123456789' DAY TO SECOND )", expected: '+123456789 23:59:59.123456789' },
-      { type: 'INTERVAL YEAR TO MONTH', in_val: "ANYDATA.ConvertIntervalYM( INTERVAL '123456789-11' YEAR TO MONTH )", expected: '+123456789-11' },
-      { type: 'NUMBER', in_val: 'ANYDATA.ConvertNumber( 3 )', expected: '3' },
-      { type: 'VARCHAR', in_val: "ANYDATA.ConvertVarchar( 'Sample varchar' )", expected: "'Sample varchar'" },
-      { type: 'VARCHAR2', in_val: "ANYDATA.ConvertVarchar2( 'Sample varchar2' )", expected: "'Sample varchar2'" },
+      { type: 'binary_double', in_val: 'anydata.ConvertBDouble(123.456789)', expected: '1.23456789E+002' },
+      { type: 'binary_float', in_val: 'anydata.ConvertBFloat(123.456)', expected: '1.23456001E+002' },
+      { type: 'blob', in_val: "anydata.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
+      { type: 'raw',  in_val: "anydata.ConvertRaw( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
+      { type: 'clob', in_val: "anydata.ConvertClob('clob value')", expected: "'clob value'" },
+      { type: 'char', in_val: "anydata.ConvertChar( 'A' )", expected: "'A'" },
+      { type: 'date', in_val: "anydata.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: "to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' )" },
+      { type: 'integer', in_val: 'anydata.ConvertNumber( CAST(1 AS INTEGER) )', expected: '1' },
+      { type: 'interval day to second', in_val: "anydata.ConvertIntervalDS( interval '123456789 23:59:59.123456789' day to second )", expected: "interval '+123456789 23:59:59.123456789' day to second" },
+      { type: 'interval year to month', in_val: "anydata.ConvertIntervalYM( interval '123456789-11' year to month )", expected: "interval '+123456789-11' year to month" },
+      { type: 'number', in_val: 'anydata.ConvertNumber( 3 )', expected: '3' },
+      { type: 'varchar', in_val: "anydata.ConvertVarchar( 'Sample varchar' )", expected: "'Sample varchar'" },
+      { type: 'varchar2', in_val: "anydata.ConvertVarchar2( 'Sample varchar2' )", expected: "'Sample varchar2'" },
     ].each do |test_case|
       it "converts a #{test_case[:type]} into a string representation" do
         expect(return_string_value test_case[:in_val]).to eq test_case[:expected]
@@ -107,72 +107,72 @@ describe 'Build any_data object from ANYDATA' do
   context 'user defined object type' do
 
     it 'converts an object into string representation' do
-      test_object="GENERIC_UTIL.DATATYPE_OBJ(
-   A01 => 123.456789,
-   A02 => 123.456,
-   A03 => utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%'),
-   A04 => 'clob value',
-   A05 => 'Y',
-   A06 => TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ),
-   A07 => 1,
-   A08 => INTERVAL '123456789 23:59:59.123456789' DAY TO SECOND,
-   A09 => INTERVAL '123456789-11' YEAR TO MONTH,
-   A10 => 3.1234567890123456789012345678901234567,
-   A11 => 'Sample varchar',
-   A12 => 'Sample varchar2',
-   A13 => 'Sample character varying',
-   A14 => 123456789,
-   A15 => 123456789,
-   A16 => utl_raw.cast_to_raw('ab')
+      test_object="generic_util.datatype_obj(
+   a01 => 123.456789,
+   a02 => 123.456,
+   a03 => utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%'),
+   a04 => 'clob value',
+   a05 => 'Y',
+   a06 => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
+   a07 => 1,
+   a08 => interval '123456789 23:59:59.123456789' day to second,
+   a09 => interval '123456789-11' year to month,
+   a10 => 3.1234567890123456789012345678901234567,
+   a11 => 'Sample varchar',
+   a12 => 'Sample varchar2',
+   a13 => 'Sample character varying',
+   a14 => 123456789,
+   a15 => 123456789,
+   a16 => utl_raw.cast_to_raw('ab')
 )"
-      expected   = "GENERIC_UTIL.DATATYPE_OBJ(
-   A01 => 1.23456789E+002,
-   A02 => 1.23456001E+002,
-   A03 => '1234%$#$%DRGSDFG$#%',
-   A04 => 'clob value',
-   A05 => 'Y',
-   A06 => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
-   A07 => 1,
-   A08 => +123456789 23:59:59.123456789,
-   A09 => +123456789-11,
-   A10 => 3.1234567890123456789012345678901234567,
-   A11 => 'Sample varchar',
-   A12 => 'Sample varchar2',
-   A13 => 'Sample character varying',
-   A14 => 123456789,
-   A15 => 123456789,
-   A16 => 'ab'
+      expected   = "generic_util.datatype_obj(
+   a01 => 1.23456789E+002,
+   a02 => 1.23456001E+002,
+   a03 => '1234%$#$%DRGSDFG$#%',
+   a04 => 'clob value',
+   a05 => 'Y',
+   a06 => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
+   a07 => 1,
+   a08 => interval '+123456789 23:59:59.123456789' day to second,
+   a09 => interval '+123456789-11' year to month,
+   a10 => 3.1234567890123456789012345678901234567,
+   a11 => 'Sample varchar',
+   a12 => 'Sample varchar2',
+   a13 => 'Sample character varying',
+   a14 => 123456789,
+   a15 => 123456789,
+   a16 => 'ab'
 )"
-      expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
+      expect(return_string_value "anydata.ConvertObject( #{test_object} )").to eq expected
     end
 
     it 'converts nested object into string representation' do
       test_object="test_parent_object( 1234, test_obj( 'some characters', 1234567890.12345678901) )"
-      expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
-   SOME_ID => 1234,
-   CHILD_OBJ => GENERIC_UTIL.TEST_OBJ(
-      TEXT => 'some characters',
-      ID => 1234567890.12345678901
+      expected   = "generic_util.test_parent_object(
+   some_id => 1234,
+   child_obj => generic_util.test_obj(
+      text => 'some characters',
+      id => 1234567890.12345678901
    )
 )"
-      expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
+      expect(return_string_value "anydata.ConvertObject( #{test_object} )").to eq expected
     end
 
     it 'converts an object containing a collection into string representation' do
-      test_col_obj="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', test_col( 1, 2, 3.456, 7.8, 9 ), 1.23 )"
-      expected    = "GENERIC_UTIL.TEST_COL_OBJ(
-   A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
-   A_CHAR => 'some characters',
-   A_COL => GENERIC_UTIL.TEST_COL(
+      test_col_obj="test_col_obj( to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ), 'some characters', test_col( 1, 2, 3.456, 7.8, 9 ), 1.23 )"
+      expected    = "generic_util.test_col_obj(
+   a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
+   a_char => 'some characters',
+   a_col => generic_util.test_col(
       1,
       2,
       3.456,
       7.8,
       9
    ),
-   A_NUM2 => 1.23
+   a_num2 => 1.23
 )"
-      expect(return_string_value "ANYDATA.ConvertObject( #{test_col_obj} )").to eq expected
+      expect(return_string_value "anydata.ConvertObject( #{test_col_obj} )").to eq expected
     end
 
   end
@@ -182,78 +182,78 @@ describe 'Build any_data object from ANYDATA' do
 
     it 'converts collection of primitives into string representation' do
       test_collection='test_col( 1, 2, 3.456, 7.8, 9 )'
-      expected       = 'GENERIC_UTIL.TEST_COL(
+      expected       = 'generic_util.test_col(
    1,
    2,
    3.456,
    7.8,
    9
 )'
-      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
+      expect(return_string_value "anydata.ConvertCollection( #{test_collection} )").to eq expected
 
     end
 
     it 'converts collection of objects into string representation' do
       test_object    ="test_obj('test',1)"
       test_collection="test_obj_col( #{test_object},#{test_object} )"
-      expected       = "GENERIC_UTIL.TEST_OBJ_COL(
-   GENERIC_UTIL.TEST_OBJ(
-      TEXT => 'test',
-      ID => 1
+      expected       = "generic_util.test_obj_col(
+   generic_util.test_obj(
+      text => 'test',
+      id => 1
    ),
-   GENERIC_UTIL.TEST_OBJ(
-      TEXT => 'test',
-      ID => 1
+   generic_util.test_obj(
+      text => 'test',
+      id => 1
    )
 )"
-      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
+      expect(return_string_value "anydata.ConvertCollection( #{test_collection} )").to eq expected
     end
 
     it 'converts collection of collections into string representation' do
       test_collection='test_col_col(test_col( 1, 2, 3.456, 7.8, 9 ), test_col( 4,5,6,7.89 ))'
-      expected       = 'GENERIC_UTIL.TEST_COL_COL(
-   GENERIC_UTIL.TEST_COL(
+      expected       = 'generic_util.test_col_col(
+   generic_util.test_col(
       1,
       2,
       3.456,
       7.8,
       9
    ),
-   GENERIC_UTIL.TEST_COL(
+   generic_util.test_col(
       4,
       5,
       6,
       7.89
    )
 )'
-      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
+      expect(return_string_value "anydata.ConvertCollection( #{test_collection} )").to eq expected
     end
 
     it 'converts collection of objects with collections into string representation' do
       test_collection ='test_col( 1, 2 )'
       test_col_obj    ="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', #{test_collection}, 1.23 )"
       test_col_obj_col="test_col_obj_col( #{test_col_obj}, #{test_col_obj} )"
-      expected        = "GENERIC_UTIL.TEST_COL_OBJ_COL(
-   GENERIC_UTIL.TEST_COL_OBJ(
-      A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
-      A_CHAR => 'some characters',
-      A_COL => GENERIC_UTIL.TEST_COL(
+      expected        = "generic_util.test_col_obj_col(
+   generic_util.test_col_obj(
+      a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
+      a_char => 'some characters',
+      a_col => generic_util.test_col(
          1,
          2
       ),
-      A_NUM2 => 1.23
+      a_num2 => 1.23
    ),
-   GENERIC_UTIL.TEST_COL_OBJ(
-      A_DATE => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
-      A_CHAR => 'some characters',
-      A_COL => GENERIC_UTIL.TEST_COL(
+   generic_util.test_col_obj(
+      a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
+      a_char => 'some characters',
+      a_col => generic_util.test_col(
          1,
          2
       ),
-      A_NUM2 => 1.23
+      a_num2 => 1.23
    )
 )"
-      expect(return_string_value "ANYDATA.ConvertCollection( #{test_col_obj_col} )").to eq expected
+      expect(return_string_value "anydata.ConvertCollection( #{test_col_obj_col} )").to eq expected
     end
 
   end
@@ -264,31 +264,31 @@ describe 'Build any_data object from ANYDATA' do
       test_object    ="test_obj('test',1)"
       test_sub_object="test_under_obj('test',1,'description')"
       test_collection="test_obj_col( #{test_object},#{test_sub_object} )"
-      expected       = "GENERIC_UTIL.TEST_OBJ_COL(
-   GENERIC_UTIL.TEST_OBJ(
-      TEXT => 'test',
-      ID => 1
+      expected       = "generic_util.test_obj_col(
+   generic_util.test_obj(
+      text => 'test',
+      id => 1
    ),
-   GENERIC_UTIL.TEST_UNDER_OBJ(
-      TEXT => 'test',
-      ID => 1,
-      DESCRIPTION => 'description'
+   generic_util.test_under_obj(
+      text => 'test',
+      id => 1,
+      description => 'description'
    )
 )"
-      expect(return_string_value "ANYDATA.ConvertCollection( #{test_collection} )").to eq expected
+      expect(return_string_value "anydata.ConvertCollection( #{test_collection} )").to eq expected
     end
 
     it 'converts sub-typed object within an object' do
       test_object="test_parent_object( 1234, test_under_obj( 'some characters', 1234567890.12345678901, 'description') )"
-      expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
-   SOME_ID => 1234,
-   CHILD_OBJ => GENERIC_UTIL.TEST_UNDER_OBJ(
-      TEXT => 'some characters',
-      ID => 1234567890.12345678901,
-      DESCRIPTION => 'description'
+      expected   = "generic_util.test_parent_object(
+   some_id => 1234,
+   child_obj => generic_util.test_under_obj(
+      text => 'some characters',
+      id => 1234567890.12345678901,
+      description => 'description'
    )
 )"
-      expect(return_string_value "ANYDATA.ConvertObject( #{test_object} )").to eq expected
+      expect(return_string_value "anydata.ConvertObject( #{test_object} )").to eq expected
     end
 
   end

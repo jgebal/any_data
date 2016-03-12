@@ -4,7 +4,10 @@ create or replace type any_data_attribute authid current_user under any_data (
    overriding member function get_self_family_name return varchar2,
    overriding member function compare_internal( p_other any_data ) return integer,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
-   constructor function any_data_attribute( self in out nocopy any_data_attribute, p_name varchar2, p_data any_data ) return self as result
+   constructor function any_data_attribute( self in out nocopy any_data_attribute, name varchar2, data_value any_data ) return self as result,
+   constructor function any_data_attribute(
+      self in out nocopy any_data_attribute, type_code number, type_name varchar2, self_type_name varchar2, name varchar2, data_value any_data
+   ) return self as result
 );
 /
 
@@ -23,7 +26,7 @@ create or replace type body any_data_attribute is
                 and self.data_value is null and treat(p_other as any_data_attribute).data_value is null then 0
                when self.data_value is null
                then null
-               when UPPER(self.name) = UPPER(treat(p_other as any_data_attribute).name)
+               when self.name = treat(p_other as any_data_attribute).name
                then self.data_value.compare( treat(p_other as any_data_attribute).data_value )
                when self.name > treat(p_other as any_data_attribute).name
                then 1
@@ -40,13 +43,23 @@ create or replace type body any_data_attribute is
          return v_result;
       end;
 
-   constructor function any_data_attribute( self in out nocopy any_data_attribute, p_name varchar2, p_data any_data ) return self as result is
+   constructor function any_data_attribute( self in out nocopy any_data_attribute, name varchar2, data_value any_data ) return self as result is
       begin
          self.self_type_name := 'any_data_attribute';
-         self.name := p_name;
-         self.data_value := p_data;
+         self.name := lower(name);
+         self.data_value := data_value;
          return;
       end;
+   constructor function any_data_attribute(
+      self in out nocopy any_data_attribute, type_code number, type_name varchar2, self_type_name varchar2, name varchar2, data_value any_data
+   ) return self as result is
+      begin
+         self.self_type_name := 'any_data_attribute';
+         self.name := lower(name);
+         self.data_value := data_value;
+         return;
+      end;
+
 
 end;
 /

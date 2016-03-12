@@ -46,7 +46,7 @@ describe 'any_data construction' do
     it 'creates instance of object using full constructor' do
       expected ={
         type_code: plsql.dbms_types.typecode_namedcollection,
-        type_name: 'COLLECTION',
+        type_name: 'collection',
         self_type_name: 'any_data_collection',
         data_values: plsql.any_data_tab( NULL )
       }
@@ -76,7 +76,7 @@ describe 'any_data construction' do
     it 'creates instance of object using full constructor' do
       expected ={
         type_code: plsql.dbms_types.typecode_object,
-        type_name: 'OBJECT',
+        type_name: 'object',
         self_type_name: 'any_data_object',
         data_values: plsql.any_data_tab( NULL )
       }
@@ -89,7 +89,7 @@ describe 'any_data construction' do
     it 'creates instance of object using data values and type name' do
       expected ={
         type_code: plsql.dbms_types.typecode_object,
-        type_name: 'AN_OBJECT',
+        type_name: 'an_object',
         self_type_name: 'any_data_object',
         data_values: plsql.any_data_tab( NULL )
       }
