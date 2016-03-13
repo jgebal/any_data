@@ -15,22 +15,22 @@ describe 'Build any_data object from anydata' do
     plsql.execute 'create or replace type test_col as table of number(5,3)'
     plsql.execute <<-SQL
       create or replace type datatype_obj as object(
-      a01 BINARY_DOUBLE,
-      a02 BINARY_FLOAT,
-      a03 BLOB,
-      a04 CLOB,
-      a05 CHAR(1),
-      a06 DATE,
-      a07 INTEGER,
-      a08 INTERVAL DAY(9) TO SECOND(9),
-      a09 INTERVAL YEAR(9) TO MONTH,
-      a10 NUMBER,
-      a11 VARCHAR(32767),
-      a12 VARCHAR2(32767),
-      a13 CHARACTER VARYING(30) ,
-      a14 INT,
-      a15 SMALLINT,
-      a16 RAW(32767)
+      a01 binary_double,
+      a02 binary_float,
+      a03 blob,
+      a04 clob,
+      a05 char(1),
+      a06 date,
+      a07 integer,
+      a08 interval day(9) to second(9),
+      a09 interval year(9) to month,
+      a10 number,
+      a11 varchar(32767),
+      a12 varchar2(32767),
+      a13 character varying(30) ,
+      a14 int,
+      a15 smallint,
+      a16 raw(32767)
       )
     SQL
     plsql.execute <<-SQL
@@ -88,7 +88,7 @@ describe 'Build any_data object from anydata' do
       { type: 'binary_float', in_val: 'anydata.ConvertBFloat(123.456)', expected: '1.23456001E+002' },
       { type: 'blob', in_val: "anydata.ConvertBlob( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
       { type: 'raw',  in_val: "anydata.ConvertRaw( utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%') )", expected: "'1234%$#$%DRGSDFG$#%'" },
-      { type: 'clob', in_val: "anydata.ConvertClob('clob value')", expected: "'clob value'" },
+      { type: 'clob', in_val: "anydata.ConvertClob('clob ''value')", expected: "'clob ''value'" },
       { type: 'char', in_val: "anydata.ConvertChar( 'A' )", expected: "'A'" },
       { type: 'date', in_val: "anydata.ConvertDate( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ) )", expected: "to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' )" },
       { type: 'integer', in_val: 'anydata.ConvertNumber( CAST(1 AS INTEGER) )', expected: '1' },

@@ -31,7 +31,7 @@ describe 'any_data construction' do
     { type_code: plsql.dbms_types.typecode_char,     type_name: 'CHAR',          self_type_name: 'any_data_char',     data_value: 'A' },
     { type_code: plsql.dbms_types.typecode_varchar,  type_name: 'VARCHAR',       self_type_name: 'any_data_varchar',  data_value: 'Sample varchar' },
     { type_code: plsql.dbms_types.typecode_varchar2, type_name: 'VARCHAR2',      self_type_name: 'any_data_varchar2', data_value: 'Sample varchar2' },
-    { type_code: plsql.dbms_types.typecode_clob,     type_name: 'CLOB',          self_type_name: 'any_data_clob',     data_value: 'clob value' },
+    { type_code: plsql.dbms_types.typecode_clob,     type_name: 'CLOB',          self_type_name: 'any_data_clob',     data_value: 'clob ''value' },
     { type_code: plsql.dbms_types.typecode_date,     type_name: 'DATE',          self_type_name: 'any_data_date',     data_value: Time.today },
   ].each do |element|
 
