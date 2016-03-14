@@ -23,7 +23,6 @@ describe 'any_data construction' do
     # { type_code: plsql.dbms_types.typecode_bfloat,   type_name: 'BINARY_FLOAT',  self_type_name: 'any_data_bfloat',   data_value: 123.125 },
     # { type_code: plsql.dbms_types.typecode_interval_ds,  type_name: 'INTERVAL DAY TO SECOND', self_type_name: 'any_data_intervalds',  data_value: '12345:23:59:59.123456789' },
     # { type_code: plsql.dbms_types.typecode_interval_ym,  type_name: 'INTERVAL YEAR TO MONTH', self_type_name: 'any_data_intervalym',  data_value: '12345-12' },
-    # { type_code: plsql.dbms_types.typecode_bfloat,   type_name: 'BINARY_FLOAT',  self_type_name: 'any_data_bfloat',   data_value: 123.125 },
     # RAW type is not fully supported in ruby-plsql
     # { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',      data_value: "01AB" },
     { type_code: plsql.dbms_types.typecode_number,   type_name: 'NUMBER',        self_type_name: 'any_data_number',   data_value: 3 },
