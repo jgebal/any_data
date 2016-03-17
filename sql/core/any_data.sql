@@ -122,7 +122,7 @@ create or replace type body any_data as
 
    final member function not_equals( p_other any_data ) return boolean is
       begin
-         return coalesce( compare( p_other ) != 0, false );
+         return not equals( p_other );
       end;
 
    member function greater_than( p_other any_data ) return boolean is
