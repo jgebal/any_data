@@ -14,13 +14,54 @@ That got me thinking about an alternative approach.
 Oracle supplies ANYDATA type that allows almost any data to be passed into a plsql routine.
 Unfortunately, the ANYDATA type is not user (developer) friendly and i guess this is main reason I've never see it in action actually.
 
-This project is making use of ANYDATA and ANYTYPE to inspect the objects and convert them into a set of predefined objects that can be used to achieve quite interesting things.
+This project is making use of ANYDATA and ANYTYPE to inspect the objects and convert them into a reportable and comparable structure.
 
 Use-case scenarios for using the library.
 
+# Main Features
+
+* Convert from ANYDATA Oracle datatype into a flexible object structure
+
+* Convert scalar, user defined types and collections into:
+    * Multiline string value (for reporting)
+    * Collection of string values (for reporting)
+
+* Compare scalar, user defined types and collections for:
+    * equality
+    * inequality
+    * inclusion (collections) - TODO
+    * likeness (objects, strings) - TODO
+    * regex match (strings) - TODO
+
+* Strong type comparison between type families - it's assumed that type families are not comparable ()apple vs. grape) - stronger than Oracle comparison
+    * varchar does not equal number
+    * varchar does not equal date
+    * raw does not equal varchar
+
+Through 17 years of work with Oracle I've seen so many NVL's that you could probably build a bridge from Dublin to London using printout of those with font size 8.
+This project supports a different NULL logic for comparing.
+* Generic NULL comparison
+    * NULL value compared to NULL value is True
+    * non NULL value compared to NULL value is NULL
+* Equality comparison
+    * NULL == NULL is True
+    * NOT NULL == NULL is False
+
+
+
+* Simplified type comparison. All types can be compared and comparison returns some result ( without raising runtime or compile time exception )
+
+* Compare cursors with CSV/Collection of objects for likeness -TODO
+
+* Construction of objects from string representation (constructor/json/xml) - TODO
+
 # Sample use cases
 
+The below examples illustrate some of the great thing that can be easily achieved with the framework.
+
 ## Logging parameters
+
+Using the framework you can easly obtain string representation of any object either in form of a string value or a collection of strings that you can iterate over or use in SQL query.
 
 ### Printing outputs with to_string
 Given: I'm connected as user `generic_util`
@@ -199,6 +240,7 @@ select *
 Then: I get result set is rows
 ```
 COLUMN_VALUE
+---------------------
 generic_util.employee(
    emp_no => 1,
    emp_name => 'Chuck Norris',
@@ -210,6 +252,10 @@ generic_util.employee(
 ```
 
 ### Comparing any data
+
+Using the framework it takes only one line to compare two objects or two collections.
+You can even compare 2 objects of different type.
+
 Given: I'm connected as user `generic_util`
 
 And: the following user defined types exist
