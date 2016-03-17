@@ -24,14 +24,15 @@ describe 'any_data construction' do
     # { type_code: plsql.dbms_types.typecode_interval_ds,  type_name: 'INTERVAL DAY TO SECOND', self_type_name: 'any_data_intervalds',  data_value: '12345:23:59:59.123456789' },
     # { type_code: plsql.dbms_types.typecode_interval_ym,  type_name: 'INTERVAL YEAR TO MONTH', self_type_name: 'any_data_intervalym',  data_value: '12345-12' },
     # RAW type is not fully supported in ruby-plsql
-    # { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',      data_value: "01AB" },
-    { type_code: plsql.dbms_types.typecode_number,   type_name: 'NUMBER',        self_type_name: 'any_data_number',   data_value: 3 },
-    { type_code: plsql.dbms_types.typecode_blob,     type_name: 'BLOB',          self_type_name: 'any_data_blob',     data_value: "O1AA" },
-    { type_code: plsql.dbms_types.typecode_char,     type_name: 'CHAR',          self_type_name: 'any_data_char',     data_value: 'A' },
-    { type_code: plsql.dbms_types.typecode_varchar,  type_name: 'VARCHAR',       self_type_name: 'any_data_varchar',  data_value: 'Sample varchar' },
-    { type_code: plsql.dbms_types.typecode_varchar2, type_name: 'VARCHAR2',      self_type_name: 'any_data_varchar2', data_value: 'Sample varchar2' },
-    { type_code: plsql.dbms_types.typecode_clob,     type_name: 'CLOB',          self_type_name: 'any_data_clob',     data_value: 'clob ''value' },
-    { type_code: plsql.dbms_types.typecode_date,     type_name: 'DATE',          self_type_name: 'any_data_date',     data_value: Time.today },
+    # { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',       data_value: "01AB" },
+    { type_code: plsql.dbms_types.typecode_number,     type_name: 'NUMBER',        self_type_name: 'any_data_number',    data_value: 3 },
+    { type_code: plsql.dbms_types.typecode_blob,       type_name: 'BLOB',          self_type_name: 'any_data_blob',      data_value: "O1AA" },
+    { type_code: plsql.dbms_types.typecode_char,       type_name: 'CHAR',          self_type_name: 'any_data_char',      data_value: 'A' },
+    { type_code: plsql.dbms_types.typecode_varchar,    type_name: 'VARCHAR',       self_type_name: 'any_data_varchar',   data_value: 'Sample varchar' },
+    { type_code: plsql.dbms_types.typecode_varchar2,   type_name: 'VARCHAR2',      self_type_name: 'any_data_varchar2',  data_value: 'Sample varchar2' },
+    { type_code: plsql.dbms_types.typecode_clob,       type_name: 'CLOB',          self_type_name: 'any_data_clob',      data_value: 'clob ''value' },
+    { type_code: plsql.dbms_types.typecode_date,       type_name: 'DATE',          self_type_name: 'any_data_date',      data_value: Time.today },
+    # { type_code: 187,                                  type_name: 'TIMESTAMP',     self_type_name: 'any_data_timestamp', data_value: Time.now },
   ].each do |element|
 
     describe element[:self_type_name] do
