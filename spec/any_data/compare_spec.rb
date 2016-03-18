@@ -81,7 +81,7 @@ describe 'any data compare' do
       {type_name: 'any_data_varchar',  other_data_value: "'Other varchar'",                                            data_value: "'A varchar'" },
       {type_name: 'any_data_varchar2', other_data_value: "'Other varchar2'",                                           data_value: "'A varchar2'" },
       {type_name: 'any_data_date',     other_data_value: "to_date('2016-02-29','yyyy-mm-dd')",                         data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
-      {type_name: 'any_data_timestamp',other_data_value: "to_timestamp('2016-02-29 23:59:59.123456789','yyyy-mm-dd hh24:mi:ssxff9')", data_value: "to_timestamp('2016-02-29 23:59:59.123456000','yyyy-mm-dd hh24:mi:ssxff9')" },
+      {type_name: 'any_data_timestamp',other_data_value: "to_timestamp('2016-02-29 23:59:59.123456789','yyyy-mm-dd hh24:mi:ssxff9')", data_value: "to_timestamp('2016-02-29 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff9')" },
     ].each do |element|
 
       describe element[:type_name] do
