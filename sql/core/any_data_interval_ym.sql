@@ -1,16 +1,16 @@
-create or replace type any_data_intervalym authid current_user under any_data(
+create or replace type any_data_interval_ym authid current_user under any_data(
    data_value yminterval_unconstrained,
    overriding member function get_self_family_name return varchar2,
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array,
-   constructor function any_data_intervalym( self in out nocopy any_data_intervalym, p_data yminterval_unconstrained ) return self as result
+   constructor function any_data_interval_ym( self in out nocopy any_data_interval_ym, p_data yminterval_unconstrained ) return self as result
 );
 /
 
-create or replace type body any_data_intervalym as
+create or replace type body any_data_interval_ym as
 
    overriding member function get_self_family_name return varchar2 is
       begin
-         return 'any_data_intervalym';
+         return 'any_data_interval_ym';
       end;
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
@@ -21,11 +21,11 @@ create or replace type body any_data_intervalym as
    /* Alternative implementation using 'unconstrained' data type workaround
      https://docs.oracle.com/cd/B19306_01/appdev.102/b14261/datatypes.htm
    */
-   constructor function any_data_intervalym( self in out nocopy any_data_intervalym, p_data yminterval_unconstrained ) return self as result is
+   constructor function any_data_interval_ym( self in out nocopy any_data_interval_ym, p_data yminterval_unconstrained ) return self as result is
       begin
          self.type_code := dbms_types.typecode_interval_ym;
          self.type_name := 'INTERVAL YEAR TO MONTH';
-         self.self_type_name := 'any_data_intervalym';
+         self.self_type_name := 'any_data_interval_ym';
          self.data_value := p_data;
          return;
       end;

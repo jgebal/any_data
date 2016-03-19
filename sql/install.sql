@@ -37,8 +37,8 @@ alter session set plsql_optimize_level = 3;
 @@sql/core/any_data_timestamp_tz.sql
 @@sql/core/any_data_timestamp_ltz.sql
 
-@@sql/core/any_data_intervalds.sql
-@@sql/core/any_data_intervalym.sql
+@@sql/core/any_data_interval_ds.sql
+@@sql/core/any_data_interval_ym.sql
 
 
 @@sql/converter/any_type_mapper.sql

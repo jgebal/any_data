@@ -7,8 +7,8 @@ drop type any_data_timestamp_ltz;
 drop type any_data_timestamp_tz;
 drop type any_data_timestamp;
 drop type any_data_date;
-drop type any_data_intervalym;
-drop type any_data_intervalds;
+drop type any_data_interval_ym;
+drop type any_data_interval_ds;
 
 drop type any_data_blob;
 drop type any_data_raw;

@@ -11,9 +11,9 @@ create or replace type body any_data_timestamp_ltz as
       begin
          return
          string_array(
-            q'[to_timestamp_ltz( ']'
-            || to_char( data_value, 'yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm' )
-            || q'[', 'yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm' )]'
+            q'[to_timestamp( ']'
+            || to_char( data_value, 'yyyy-mm-dd hh24:mi:ssxff9' )
+            || q'[', 'yyyy-mm-dd hh24:mi:ssxff9' )]'
             || p_separator
          );
       end;
