@@ -3,6 +3,7 @@ drop package any_data_builder;
 drop type any_type_mapper;
 
 --final types
+drop type any_data_timestamp_tz;
 drop type any_data_timestamp;
 drop type any_data_date;
 drop type any_data_intervalym;

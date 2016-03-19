@@ -19,7 +19,7 @@ end
 
 shared_examples 'any data comparable types' do |type, value, other_type, other_value |
 
-  value, other_value = value<other_value ? [value, other_value] : [other_value, value]
+  value, bigger_value = value<other_value ? [value, other_value] : [other_value, value]
   include_context 'compare'
 
   context 'non null values comparison' do
@@ -29,12 +29,12 @@ shared_examples 'any data comparable types' do |type, value, other_type, other_v
     end
 
     it 'returns -1 if self value is bigger' do
-      expect(compare(type, value, other_type, other_value)).to eq -1
+      expect(compare(type, value, other_type, bigger_value)).to eq -1
     end
 
     it 'returns 1 if compared value is bigger' do
-      expect(compare(other_type, other_value, type, value)).to eq 1
-    end
+      expect(compare(other_type, bigger_value, type, value)).to eq 1
+   end
 
   end
 
@@ -71,17 +71,22 @@ describe 'any data compare' do
 
   context 'identical scalar types' do
     [
-      {type_name: 'any_data_bdouble',  other_data_value: 987.654321,                                                   data_value: 123.456789 },
-      {type_name: 'any_data_bfloat',   other_data_value: 521.321,                                                      data_value: 123.125 },
-      {type_name: 'any_data_number',   other_data_value: 6,                                                            data_value: 3 },
-      {type_name: 'any_data_blob',     other_data_value: "utl_raw.cast_to_raw('324$#%')",                              data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
-      {type_name: 'any_data_raw',      other_data_value: "utl_raw.cast_to_raw('324$#%')",                              data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
-      {type_name: 'any_data_clob',     other_data_value: "'Different value'||'#{('a'*32767)}'",                        data_value: "'Clob value'||'#{('a'*32767)}'"},
-      {type_name: 'any_data_char',     other_data_value: "'B'",                                                        data_value: "'A'" },
-      {type_name: 'any_data_varchar',  other_data_value: "'Other varchar'",                                            data_value: "'A varchar'" },
-      {type_name: 'any_data_varchar2', other_data_value: "'Other varchar2'",                                           data_value: "'A varchar2'" },
-      {type_name: 'any_data_date',     other_data_value: "to_date('2016-02-29','yyyy-mm-dd')",                         data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
-      {type_name: 'any_data_timestamp',other_data_value: "to_timestamp('2016-02-29 23:59:59.123456789','yyyy-mm-dd hh24:mi:ssxff9')", data_value: "to_timestamp('2016-02-29 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff9')" },
+      {type_name: 'any_data_bdouble',       other_data_value: 987.654321,                            data_value: 123.456789 },
+      {type_name: 'any_data_bfloat',        other_data_value: 521.321,                               data_value: 123.125 },
+      {type_name: 'any_data_number',        other_data_value: 6,                                     data_value: 3 },
+      {type_name: 'any_data_blob',          other_data_value: "utl_raw.cast_to_raw('324$#%')",       data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
+      {type_name: 'any_data_raw',           other_data_value: "utl_raw.cast_to_raw('324$#%')",       data_value: "utl_raw.cast_to_raw('1234%$#$%DRGSDFG$#%')" },
+      {type_name: 'any_data_clob',          other_data_value: "'Different value'||'#{('a'*32767)}'", data_value: "'Clob value'||'#{('a'*32767)}'"},
+      {type_name: 'any_data_char',          other_data_value: "'B'",                                 data_value: "'A'" },
+      {type_name: 'any_data_varchar',       other_data_value: "'Other varchar'",                     data_value: "'A varchar'" },
+      {type_name: 'any_data_varchar2',      other_data_value: "'Other varchar2'",                    data_value: "'A varchar2'" },
+      {type_name: 'any_data_date',          other_data_value: "to_date('2016-02-29','yyyy-mm-dd')",  data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
+      {type_name: 'any_data_timestamp',
+       other_data_value: "to_timestamp('2016-02-29 23:59:59.123456789','yyyy-mm-dd hh24:mi:ssxff9')",
+       data_value: "to_timestamp('2016-02-29 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff9')" },
+      {type_name: 'any_data_timestamp_tz',
+       other_data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')",
+       data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789  00:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')" },
     ].each do |element|
 
       describe element[:type_name] do
@@ -111,8 +116,9 @@ describe 'any data compare' do
         {type_name: 'any_data_clob',     data_value: "'Clob value'||'#{('a'*32000)}'"},
       ],
       [
-        {type_name: 'any_data_date',     data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
-        {type_name: 'any_data_timestamp',data_value: "to_timestamp('2016-02-25 23:59:59.123456789','yyyy-mm-dd hh24:mi:ssxff')"},
+        {type_name: 'any_data_date',         data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
+        {type_name: 'any_data_timestamp',    data_value: "to_timestamp('2016-02-25 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff')"},
+        {type_name: 'any_data_timestamp_tz', data_value: "to_timestamp_tz('2016-02-25 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff tzh:tzm')"},
       ],
     ].each do |family|
 
