@@ -87,6 +87,9 @@ describe 'any data compare' do
       {type_name: 'any_data_timestamp_tz',
        other_data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')",
        data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789  00:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')" },
+      {type_name: 'any_data_timestamp_ltz',
+       other_data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')",
+       data_value: "to_timestamp_tz('2016-02-29 23:59:59.123456789  00:00','yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm')" },
     ].each do |element|
 
       describe element[:type_name] do
@@ -116,15 +119,16 @@ describe 'any data compare' do
         {type_name: 'any_data_clob',     data_value: "'Clob value'||'#{('a'*32000)}'"},
       ],
       [
-        {type_name: 'any_data_date',         data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
-        {type_name: 'any_data_timestamp',    data_value: "to_timestamp('2016-02-25 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff')"},
-        {type_name: 'any_data_timestamp_tz', data_value: "to_timestamp_tz('2016-02-25 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff tzh:tzm')"},
+        {type_name: 'any_data_date',          data_value: "to_date('2016-02-25','yyyy-mm-dd')" },
+        {type_name: 'any_data_timestamp',     data_value: "to_timestamp('2016-02-25 23:59:59.123456780','yyyy-mm-dd hh24:mi:ssxff')"},
+        {type_name: 'any_data_timestamp_ltz', data_value: "to_timestamp_tz('2016-02-25 23:59:59.123456789 -01:00','yyyy-mm-dd hh24:mi:ssxff tzh:tzm')"},
+        {type_name: 'any_data_timestamp_tz',  data_value: "to_timestamp_tz('2016-02-25 23:59:59.123456789 -02:00','yyyy-mm-dd hh24:mi:ssxff tzh:tzm')"},
       ],
     ].each do |family|
 
       family.permutation(2).to_a.each do |left, right|
 
-        describe "compares #{left[:type_name].upcase} with #{right[:type_name].upcase}" do
+        describe "compares #{left[:type_name]} with #{right[:type_name]}" do
 
           include_examples 'any data comparable types', left[:type_name], left[:data_value], right[:type_name], right[:data_value]
 
