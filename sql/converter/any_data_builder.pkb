@@ -124,7 +124,7 @@ create or replace package body any_data_builder as
       v_sql  varchar2(32767) := c_outer_sql_block;
       v_type any_type_mapper := any_type_mapper( p_any_data );
       begin
-         v_sql := replace( v_sql, c_type_def, v_type.get_type( ) );
+         v_sql := replace( v_sql, c_type_def, v_type.get_type_unconstrained( ) );
          v_sql := replace( v_sql, c_getter, v_type.get_anydata_getter( ) );
          v_sql := replace( v_sql, c_code, indent_lines( build_sql( v_type, c_data ) ) );
          return v_sql;
