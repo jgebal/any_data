@@ -45,10 +45,6 @@ create or replace type body any_type_mapper is
       begin
          self.type_code := p_value.gettype( self.attribute_type );
          update_from_attribute_type( );
-         --adjust precision and scale for number with NULL prec/scale
-         if self.prec = 0 and self.scale = -127 then
-            self.prec := null; self.scale := null;
-         end if;
          return;
       end;
 
@@ -66,12 +62,7 @@ create or replace type body any_type_mapper is
                self.attribute_type,
                self.attribute_name
             );
-            len := len / case when type_code in ( dbms_types.typecode_nchar, dbms_types.typecode_nvarchar2 ) then 2 else 1 end;
             update_from_attribute_type( );
-            --adjust precision and scale for number with NULL prec/scale
-            if self.prec = 0 and self.scale = -127 then
-               self.prec := null; self.scale := null;
-            end if;
          end if;
          return;
       end;
@@ -80,10 +71,6 @@ create or replace type body any_type_mapper is
       begin
          self.attribute_type := p_type;
          update_from_attribute_type( );
-         --adjust precision and scale for number with NULL prec/scale
-         if self.prec = 0 and self.scale = -127 then
-            self.prec := null; self.scale := null;
-         end if;
          return;
       end;
 
@@ -102,6 +89,12 @@ create or replace type body any_type_mapper is
                self.version,
                self.attributes_count );
          end if;
+         --adjust precision and scale for number with NULL prec/scale
+         if self.prec = 0 and self.scale = -127 then
+            self.prec := null; self.scale := null;
+         end if;
+         --adjust length for nvarchar types
+         len := len / case when type_code in ( dbms_types.typecode_nchar, dbms_types.typecode_nvarchar2 ) then 2 else 1 end;
       end;
 
    member function get_typename
@@ -121,28 +114,19 @@ create or replace type body any_type_mapper is
       end;
 
    member function get_type_declaration return varchar2 is
-      function add_brackets( around_string varchar2 ) return varchar2 is
-         begin return case when around_string is not null then '(' || around_string || ')' end; end;
 
-      function get_precision_and_scale return varchar2 is
-         begin
-            return
-               case
-                  when prec is not null and scale is not null then add_brackets( prec||','||scale )
-                  else coalesce( add_brackets( prec ), add_brackets( scale ) )
-               end;
-         end;
-      function get_precision return varchar2 is begin return add_brackets( prec ); end;
-      function get_scale return varchar2 is begin return add_brackets( scale ); end;
-      function get_length return varchar2 is begin return add_brackets( len ); end;
+      function add_brackets( around_string varchar2 ) return varchar2 is
+         begin return case when around_string != ',' then '(' || around_string || ')' end; end;
+
       function add_prec_scale_len( p_type in varchar2 ) return varchar2 is
          begin
             return
             replace(
                replace(
-                  replace( replace( p_type, '{scale}', get_scale( ) ), '{precision}', get_precision( ) ),
-                  '{precision_scale}', get_precision_and_scale( ) ), '{length}', get_length( ) );
+                  replace( replace( p_type, '{scale}', add_brackets( scale ) ), '{precision}', add_brackets( prec ) ),
+                  '{precision_scale}', add_brackets( prec||','||scale ) ), '{length}', add_brackets( len ) );
          end;
+
       begin
          return coalesce( get_typename(), add_prec_scale_len( any_data_typecode_mapper.get_dbms_types_mapping( type_code ).type_declaration_template ) );
       end;
@@ -175,8 +159,6 @@ create or replace type body any_type_mapper is
    static function get_build_in_typename( p_type_code integer) return varchar2 is
       begin
          return any_data_typecode_mapper.get_dbms_types_mapping( p_type_code ).build_in_type_name;
-         exception when no_data_found then
-         raise_application_error( -20000, 'Unknown typecode = '|| p_type_code );
       end;
 end;
 /
