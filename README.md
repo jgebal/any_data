@@ -33,7 +33,7 @@ Use-case scenarios for using the library.
     * likeness (objects, strings) - TODO
     * regex match (strings) - TODO
 
-* Strong type comparison between type families - it's assumed that type families are not comparable ()apple vs. grape) - stronger than Oracle comparison
+* Strong type comparison between type families - it is assumed that type families are not comparable (apple vs. grape) - stronger than Oracle comparison
     * varchar does not equal number
     * varchar does not equal date
     * raw does not equal varchar
