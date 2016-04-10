@@ -1,14 +1,15 @@
 create or replace package body any_data_builder as
 
-   c_type_def constant varchar2(30) := '{type_name}';
-   c_declare  constant varchar2(30) := '{declare}';
-   c_code     constant varchar2(30) := '{code}';
-   c_getter   constant varchar2(30) := '{getter}';
-   c_return   constant varchar2(30) := '{return}';
-   c_value    constant varchar2(30) := '{value}';
-   c_data     constant varchar2(30) := 'v_data';
-   c_indent   constant varchar2(30) := any_data_formatter.indent_string;
-   c_nl       constant varchar2(30) := any_data_const.new_line;
+   c_type_def         constant varchar2(30) := '{type_name}';
+   c_declare          constant varchar2(30) := '{declare}';
+   c_code             constant varchar2(30) := '{code}';
+   c_getter           constant varchar2(30) := '{getter}';
+   c_return           constant varchar2(30) := '{return}';
+   c_value            constant varchar2(30) := '{value}';
+   c_data             constant varchar2(30) := 'v_data';
+   c_indent           constant varchar2(30) := any_data_formatter.indent_string;
+   c_nl               constant varchar2(30) := any_data_const.new_line;
+   c_bulk_fetch_limit constant integer := 100;
 
    c_sql_block constant varchar2(1000) :=
       'declare'||c_nl||
@@ -122,11 +123,11 @@ create or replace package body any_data_builder as
 
    function get_conversion_sql( p_any_data anydata ) return varchar2 is
       v_sql  varchar2(32767) := c_outer_sql_block;
-      v_type any_type_mapper := any_type_mapper( p_any_data );
+      v_any_type any_type_mapper := any_type_mapper( p_any_data );
       begin
-         v_sql := replace( v_sql, c_type_def, v_type.get_type_unconstrained( ) );
-         v_sql := replace( v_sql, c_getter, v_type.get_anydata_getter( ) );
-         v_sql := replace( v_sql, c_code, indent_lines( build_sql( v_type, c_data ) ) );
+         v_sql := replace( v_sql, c_type_def, v_any_type.get_type_unconstrained( ) );
+         v_sql := replace( v_sql, c_getter, v_any_type.get_anydata_getter( ) );
+         v_sql := replace( v_sql, c_code, indent_lines( build_sql( v_any_type, c_data ) ) );
          return v_sql;
       end;
 
@@ -137,109 +138,114 @@ create or replace package body any_data_builder as
          return v_result;
       end;
 
+   function get_any_type_mapper( p_column_description dbms_sql.desc_rec3 ) return any_type_mapper is
+      v_any_type any_type_mapper;
+      begin
+         if p_column_description.col_schema_name is not null
+            and p_column_description.col_type_name is not null then
+            v_any_type := any_type_mapper(
+               anytype.getpersistent( p_column_description.col_schema_name, p_column_description.col_type_name )
+            );
+            v_any_type.attribute_name := p_column_description.col_name;
+         else
+            v_any_type := any_type_mapper(
+               attribute_name     => p_column_description.col_name,
+               attribute_type     => null,
+               prec               => nullif(p_column_description.col_precision,0),
+               scale              => p_column_description.col_scale,
+               len                => p_column_description.col_max_len,
+               csid               => p_column_description.col_charsetid,
+               csfrm              => p_column_description.col_charsetform,
+               schema_name        => p_column_description.col_schema_name,
+               type_name          => p_column_description.col_type_name,
+               version            => null,
+               type_code          => any_data_typecode_mapper.get_dbms_sql_mapping( p_column_description.col_type ).dbms_types_type_code,
+               attributes_count   => null
+            );
+         end if;
+         return v_any_type;
+      end;
+
+   function get_conversion_sql( p_cursor in out nocopy sys_refcursor ) return varchar2 is
+      v_cursor_number      integer;
+      c_bulk_fetch_limit   integer := 500;
+      v_column_count       pls_integer;
+      v_column_desc        dbms_sql.desc_tab3;
+      v_any_type           any_type_mapper;
+      v_field_accessor     varchar2(4000);
+      v_anydata_converter  varchar2(30);
+      v_record_fields      varchar2(32767);
+      v_column_names       varchar2(32767);
+      v_result_row_content varchar2(32767);
+      v_sql                varchar2(32767);
+   begin
+      v_cursor_number := dbms_sql.to_cursor_number( p_cursor );
+      dbms_sql.describe_columns3( v_cursor_number, v_column_count, v_column_desc );
+      p_cursor := dbms_sql.to_refcursor( v_cursor_number );
+      for i in 1 .. v_column_count loop
+         --get_any_type_for_column
+         v_any_type := get_any_type_mapper( v_column_desc(i) );
+
+         v_field_accessor := 'v_cursor_rows(i).' || lower( v_any_type.attribute_name );
+
+         if v_any_type.type_code in ( dbms_types.typecode_object, dbms_types.typecode_varray, dbms_types.typecode_namedcollection, dbms_types.typecode_table ) then
+            v_anydata_converter := 'anydata.' || case when v_any_type.type_code = dbms_types.typecode_object then 'convertObject' else 'convertCollection' end;
+
+            v_result_row_content := v_result_row_content || 'any_data_builder.build( ' || v_anydata_converter || '( ' || v_field_accessor || ' ) ),' || c_nl;
+         else
+            v_result_row_content := v_result_row_content || v_any_type.get_any_data_constructor( v_field_accessor ) || ',' || c_nl;
+         end if;
+         v_column_names := v_column_names || '''' || v_any_type.attribute_name || ''',' || c_nl;
+         v_record_fields := v_record_fields || lower( v_any_type.attribute_name ) || ' ' || lower( v_any_type.get_type_unconstrained() ) || ',' || c_nl;
+      end loop;
+
+      v_record_fields := rtrim( v_record_fields, ',' || c_nl );
+      v_result_row_content := rtrim( v_result_row_content, ',' || c_nl );
+      v_column_names := rtrim( v_column_names, ',' || c_nl );
+
+      v_sql := c_nl ||
+               'declare' || c_nl ||
+               '   v_cursor        sys_refcursor := :p_cursor;' || c_nl ||
+               '   type t_cursor_row is record( ' || c_nl ||
+                      indent_lines( v_record_fields, 2 ) || c_nl ||
+               '   );' || c_nl ||
+               '   type t_cursor_rows is table of t_cursor_row;' || c_nl ||
+               '   v_cursor_rows   t_cursor_rows;' || c_nl ||
+               '   v_column_names  string_array := string_array();' || c_nl ||
+               '   v_result_rows   any_data_tab := any_data_tab();' || c_nl ||
+               '   v_row_number    integer := 1;' || c_nl ||
+               'begin' || c_nl ||
+               '   v_column_names := string_array( ' || c_nl ||
+                         indent_lines( v_column_names, 2 ) || c_nl ||
+               '   );' || c_nl ||
+               '   loop' || c_nl ||
+               '      fetch v_cursor bulk collect into v_cursor_rows limit ' || c_bulk_fetch_limit || ';' || c_nl ||
+               '      v_result_rows.extend( v_cursor_rows.count );' || c_nl ||
+               '      for i in 1 .. v_cursor_rows.count loop ' || c_nl ||
+               '         v_result_rows( v_row_number ) := any_data_result_row(' || c_nl ||
+               '            any_data_tab(' || c_nl ||
+                               indent_lines( v_result_row_content, 5 ) || c_nl ||
+               '            )' || c_nl ||
+               '         );' || c_nl ||
+               '         v_row_number := v_row_number + 1;' || c_nl ||
+               '      end loop;' || c_nl ||
+               '   exit when v_cursor%notfound;' || c_nl ||
+               '   end loop;' || c_nl ||
+               '   :v_result := any_data_result_set( v_result_rows, v_column_names );' || c_nl ||
+               '   close v_cursor;'|| c_nl ||
+               'end;'|| c_nl
+      ;
+
+      return v_sql;
+   end;
+
+
    function build( p_cursor sys_refcursor ) return any_data is
+      v_cursor sys_refcursor := p_cursor;
       v_result any_data;
       begin
-         return null;
-/*
-         declare
-            --   c_select_statement varchar2(32767) := 'select * from all_objects where rownum < 5000';
-            --   c_select_statement varchar2(32767) := 'select * from all_views where rownum < 500';
-            c_select_statement varchar2(32767) := 'select  string_array(1,2,3,4,5) as the_data from dual';
-            v_bulk_fetch_limit integer := 500;
-            v_cursor_number    integer;
-            v_column_count     pls_integer;
-            v_column_desc      dbms_sql.desc_tab3;
-            v_cursor           sys_refcursor;
-            v_type             any_type_mapper;
-            v_type_mapping     dbms_type_code_mappings%rowtype;
-            v_declare          varchar2(32767);
-            v_block_content    varchar2(32767);
-            v_column_names     varchar2(32767);
-            v_object           varchar2(32767);
-            v_sql              varchar2(32767);
-         begin
-            open v_cursor for c_select_statement;
-            v_cursor_number := dbms_sql.to_cursor_number( v_cursor );
-            dbms_sql.describe_columns3( v_cursor_number, v_column_count, v_column_desc );
-
-            v_declare :=      '   v_cursor_number integer;' || chr(10)
-                              || '   v_cursor        sys_refcursor;' || chr(10)
-                              || '   v_result_rows   any_data_tab := any_data_tab();' || chr(10)
-                              || '   type t_cursor_row is record( ' || chr(10);
-            v_object :=       '      v_result_rows( v_result_rows.last ) := any_data_result_set( ' || chr(10)
-                              || '         any_data_tab(' || chr(10);
-            v_column_names := '         string_array( ' || chr(10);
-            for i in 1 .. v_column_count loop
-               --get_any_type_for_column
-               if v_column_desc(i).col_schema_name is not null
-                  and v_column_desc(i).col_type_name is not null then
-                  v_type := any_type_mapper(
-                     anytype.getpersistent(
-                        v_column_desc(i).col_schema_name, v_column_desc(i).col_type_name )
-                  );
-                  v_type.attribute_name := v_column_desc(i).col_name;
-               else
-                  v_type_mapping := any_data_typecode_mapper.get_dbms_sql_mapping( v_column_desc(i).col_type );
-                  v_type := any_type_mapper(
-                     attribute_name     => v_column_desc(i).col_name,
-                     attribute_type     => null,
-                     prec               => nullif(v_column_desc(i).col_precision,0),
-                     scale              => v_column_desc(i).col_scale,
-                     len                => v_column_desc(i).col_max_len,
-                     csid               => v_column_desc(i).col_charsetid,
-                     csfrm              => v_column_desc(i).col_charsetform,
-                     schema_name        => v_column_desc(i).col_schema_name,
-                     type_name          => v_column_desc(i).col_type_name,
-                     version            => null,
-                     type_code          => v_type_mapping.dbms_types_type_code,
-                     attributes_count   => null
-                  );
-               end if;
-
-               if v_type.type_code in ( dbms_types.typecode_object, dbms_types.typecode_varray, dbms_types.typecode_namedcollection, dbms_types.typecode_table ) then
-                  v_object := v_object || '         any_data_builder.build( anydata.'
-                              || case when v_type.type_code = dbms_types.typecode_object then 'convertObject' else 'convertCollection' end
-                              || '( ' || 'v_cursor_rows(i).' || lower( v_type.attribute_name ) || ' ) )'
-                              || case when i != v_column_count then ',' end || chr(10);
-               else
-                  v_object := v_object || '         ' || v_type.get_any_data_constructor( 'v_cursor_rows(i).' || lower( v_type.attribute_name ) )
-                              || case when i != v_column_count then ',' end || chr(10);
-               end if;
-               v_column_names := v_column_names || '         ''' || v_column_desc(i).col_name || ''''
-                                 || case when i != v_column_count then ',' end || chr(10);
-               v_declare := v_declare || '         ' || lower( v_type.attribute_name ) || ' ' || lower( v_type.get_type_unconstrained() )
-                            || case when i != v_column_count then ',' end || chr(10);
-            end loop;
-            v_declare := v_declare || '   );' || chr(10)
-                         || '   type t_cursor_rows is table of t_cursor_row;' || chr(10)
-                         || '   v_cursor_rows t_cursor_rows;' || chr(10);
-            v_object := v_object || '         ),' || chr(10);
-            v_column_names := v_column_names || '         )'|| chr(10);
-            v_object := v_object || v_column_names || '      );' || chr(10);
-            v_sql := chr(10)
-                     ||'declare' || chr(10)
-                     || v_declare
-                     || 'begin' || chr(10)
-                     || '   open v_cursor for '''||replace( c_select_statement,'''','''''')||''';' || chr(10)
-                     || '   loop' || chr(10)
-                     || '      fetch v_cursor bulk collect into v_cursor_rows limit ' || v_bulk_fetch_limit || ';' || chr(10)
-                     || '      v_result_rows.extend( v_cursor_rows.count );' || chr(10)
-                     || v_block_content
-                     || '      for i in 1 .. v_cursor_rows.count loop '|| chr(10)
-                     || v_object
-                     || '      end loop;'|| chr(10)
-                     || '   exit when v_cursor%notfound;' || chr(10)
-                     || '   end loop;'|| chr(10)
-                     || '   close v_cursor;'|| chr(10)
-                     || 'end;'|| chr(10)
-            ;
-
-            dbms_output.put_line( v_sql );
-            dbms_sql.close_cursor( v_cursor_number );
-         end;
-*/
-
+         execute immediate get_conversion_sql( v_cursor ) using in v_cursor, out v_result;
+         return v_result;
       end;
 
 

@@ -12,7 +12,7 @@ create or replace type any_type_mapper as object (
    type_code          number,
    attributes_count   number,
    constructor function any_type_mapper ( self in out nocopy any_type_mapper, p_value anydata ) return self as result,
-   constructor function any_type_mapper (  self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result,
+   constructor function any_type_mapper ( self in out nocopy any_type_mapper, p_child_position pls_integer, p_parent_type anytype ) return self as result,
    constructor function any_type_mapper ( self in out nocopy any_type_mapper, p_type anytype ) return self as result,
    static function get_version return varchar2,
    member function get_type_unconstrained return varchar2,
