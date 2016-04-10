@@ -6,6 +6,8 @@ alter session set plsql_optimize_level = 3;
 @@sql/helpers/any_data_const.pks
 @@sql/helpers/any_data_formatter.pks
 @@sql/helpers/any_data_formatter.pkb
+@@sql/helpers/any_data_typecode_mapper.pks
+@@sql/helpers/any_data_typecode_mapper.pkb
 
 @@sql/core/any_data.sql
 @@sql/core/any_data_attribute.sql
@@ -40,6 +42,9 @@ alter session set plsql_optimize_level = 3;
 @@sql/core/any_data_interval_ds.sql
 @@sql/core/any_data_interval_ym.sql
 
+
+@@sql/converter/dbms_type_code_mappings.sql
+@@sql/converter/sql_type_code_mappings.sql
 
 @@sql/converter/any_type_mapper.sql
 

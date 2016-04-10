@@ -40,9 +40,12 @@ drop type any_data_attribute;
 drop type any_data;
 
 --helpers
+drop package any_data_typecode_mapper;
 drop package any_data_formatter;
 drop package any_data_const;
 drop type string_array;
 
+drop table sql_type_code_mappings;
+drop table dbms_type_code_mappings;
 
 exit
