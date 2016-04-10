@@ -45,6 +45,7 @@ drop package any_data_formatter;
 drop package any_data_const;
 drop type string_array;
 
-drop table type_code_mappings;
+drop table sql_type_code_mappings;
+drop table dbms_type_code_mappings;
 
 exit

@@ -43,7 +43,8 @@ alter session set plsql_optimize_level = 3;
 @@sql/core/any_data_interval_ym.sql
 
 
-@@sql/converter/type_code_mappings.sql
+@@sql/converter/dbms_type_code_mappings.sql
+@@sql/converter/sql_type_code_mappings.sql
 
 @@sql/converter/any_type_mapper.sql
 
