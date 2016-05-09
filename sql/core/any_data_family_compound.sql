@@ -20,8 +20,6 @@ create or replace type body any_data_family_compound as
       v_result         string_array;
       v_values_count   binary_integer := get_elements_count();
       v_elements       string_array;
-      v_elements_count binary_integer;
-      v_result_idx     binary_integer := 2;
       v_separator      varchar2(1) := ',';
       begin
          v_result := string_array( self.type_name || '(' );
@@ -29,11 +27,9 @@ create or replace type body any_data_family_compound as
          for i in 1 .. v_values_count loop
             if i = v_values_count then v_separator := null; end if;
             v_elements := any_data_formatter.indent_lines( data_values( i ).to_string_array( v_separator ) );
-            v_elements_count := coalesce( cardinality( v_elements ), 0 );
-            v_result.extend( v_elements_count );
-            for j in 1 .. v_elements_count loop
-               v_result( v_result_idx ) := v_elements( j );
-               v_result_idx := v_result_idx + 1;
+            for j in 1 .. cardinality( v_elements ) loop
+               v_result.extend();
+               v_result( v_result.last ) := v_elements( j );
             end loop;
          end loop;
 
