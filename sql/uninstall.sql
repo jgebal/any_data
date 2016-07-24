@@ -24,6 +24,8 @@ drop type any_data_number;
 
 drop type any_data_object;
 drop type any_data_collection;
+drop type any_data_result_row;
+drop type any_data_result_set;
 
 --type families
 drop type any_data_family_date;
