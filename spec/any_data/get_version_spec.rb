@@ -7,7 +7,7 @@ describe 'library version' do
       before(:all) do
         full_file_path = File.expand_path('../../../VERSION.sql', __FILE__)
         file_content = File.read(full_file_path).chomp
-        @version_in_file = file_content.sub(/define +VERSION *= *'([0-9]+\.[0-9]+\.[0-9]+)'/ ,"\\1")
+        @version_in_file = file_content.sub(/define +VERSION *= *'(.*)'/ ,"\\1")
       end
 
       it 'returns current project version number' do

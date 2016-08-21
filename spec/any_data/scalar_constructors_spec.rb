@@ -25,13 +25,13 @@ describe 'any_data construction' do
     # { type_code: plsql.dbms_types.typecode_interval_ym,  type_name: 'INTERVAL YEAR TO MONTH', self_type_name: 'any_data_interval_ym',  data_value: '12345-12' },
     # RAW type is not fully supported in ruby-plsql
     # { type_code: plsql.dbms_types.typecode_raw,      type_name: 'RAW',           self_type_name: 'any_data_raw',       data_value: "01AB" },
-    { type_code: plsql.dbms_types.typecode_number,     type_name: 'NUMBER',        self_type_name: 'any_data_number',    data_value: 3 },
-    { type_code: plsql.dbms_types.typecode_blob,       type_name: 'BLOB',          self_type_name: 'any_data_blob',      data_value: "O1AA" },
-    { type_code: plsql.dbms_types.typecode_char,       type_name: 'CHAR',          self_type_name: 'any_data_char',      data_value: 'A' },
-    { type_code: plsql.dbms_types.typecode_varchar,    type_name: 'VARCHAR',       self_type_name: 'any_data_varchar',   data_value: 'Sample varchar' },
-    { type_code: plsql.dbms_types.typecode_varchar2,   type_name: 'VARCHAR2',      self_type_name: 'any_data_varchar2',  data_value: 'Sample varchar2' },
-    { type_code: plsql.dbms_types.typecode_clob,       type_name: 'CLOB',          self_type_name: 'any_data_clob',      data_value: 'clob ''value' },
-    { type_code: plsql.dbms_types.typecode_date,       type_name: 'DATE',          self_type_name: 'any_data_date',      data_value: Time.today },
+    { type_code: plsql.dbms_types.typecode_number,     type_name: 'NUMBER',        self_type_name: 'ANY_DATA_NUMBER',    data_value: 3 },
+    { type_code: plsql.dbms_types.typecode_blob,       type_name: 'BLOB',          self_type_name: 'ANY_DATA_BLOB',      data_value: "O1AA" },
+    { type_code: plsql.dbms_types.typecode_char,       type_name: 'CHAR',          self_type_name: 'ANY_DATA_CHAR',      data_value: 'A' },
+    { type_code: plsql.dbms_types.typecode_varchar,    type_name: 'VARCHAR',       self_type_name: 'ANY_DATA_VARCHAR',   data_value: 'Sample varchar' },
+    { type_code: plsql.dbms_types.typecode_varchar2,   type_name: 'VARCHAR2',      self_type_name: 'ANY_DATA_VARCHAR2',  data_value: 'Sample varchar2' },
+    { type_code: plsql.dbms_types.typecode_clob,       type_name: 'CLOB',          self_type_name: 'ANY_DATA_CLOB',      data_value: 'clob ''value' },
+    { type_code: plsql.dbms_types.typecode_date,       type_name: 'DATE',          self_type_name: 'ANY_DATA_DATE',      data_value: Time.today },
     # { type_code: 187,                                  type_name: 'TIMESTAMP',     self_type_name: 'any_data_timestamp', data_value: Time.now },
   ].each do |element|
 
@@ -47,7 +47,7 @@ describe 'any_data construction' do
       expected ={
         type_code: plsql.dbms_types.typecode_namedcollection,
         type_name: 'collection',
-        self_type_name: 'any_data_collection',
+        self_type_name: 'ANY_DATA_COLLECTION',
         data_values: plsql.any_data_tab( NULL )
       }
 
@@ -60,7 +60,7 @@ describe 'any_data construction' do
       expected ={
         type_code: 248, #typecode_table
         type_name: 'SOME_COLLECTION',
-        self_type_name: 'any_data_collection',
+        self_type_name: 'ANY_DATA_COLLECTION',
         data_values: plsql.any_data_tab( NULL )
       }
 
@@ -77,7 +77,7 @@ describe 'any_data construction' do
       expected ={
         type_code: plsql.dbms_types.typecode_object,
         type_name: 'object',
-        self_type_name: 'any_data_object',
+        self_type_name: 'ANY_DATA_OBJECT',
         data_values: plsql.any_data_tab( NULL )
       }
 
@@ -90,7 +90,7 @@ describe 'any_data construction' do
       expected ={
         type_code: plsql.dbms_types.typecode_object,
         type_name: 'an_object',
-        self_type_name: 'any_data_object',
+        self_type_name: 'ANY_DATA_OBJECT',
         data_values: plsql.any_data_tab( NULL )
       }
 
