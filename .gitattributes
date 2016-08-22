@@ -1,0 +1,12 @@
+.travis                 export-ignore
+coverage                export-ignore
+spec                    export-ignore
+support                 export-ignore
+.gitignore              export-ignore
+.gitattributes          export-ignore
+Rakefile                export-ignore
+rspec_tests_results.txt export-ignore
+.travis.yml             export-ignore
+Gemfile.lock            export-ignore
+Gemfile                 export-ignore
+.rspec                  export-ignore
