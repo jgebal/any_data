@@ -13,7 +13,12 @@ create or replace type body any_data as
          v_array := to_string_array( );
          v_array_size := cardinality( v_array );
          for i in 1 .. v_array_size  loop
-            v_result := v_result || v_array(i) || any_data_const.new_line;
+            if length(v_result) + length(v_array(i)) > 32767 then
+               v_result := substr( v_result, 1, 32764) || '...';
+               exit;
+            else
+               v_result := v_result || v_array(i) || any_data_const.new_line;
+            end if;
          end loop;
          return rtrim( v_result, any_data_const.new_line );
       end;
