@@ -107,7 +107,7 @@ create or replace type body any_type_mapper is
 
    member function get_any_data_constructor( p_value_var_name varchar2 ) return varchar2 is
       begin
-         return get_any_data_object_name()||'( '||type_code||', '''||get_typename()||''', '''||get_any_data_object_name()||''', '||p_value_var_name||' )';
+         return get_any_data_object_name()||'( '||type_code||', '''||get_typename()||''', '''||get_any_data_object_name()||''', null, null, null, '||p_value_var_name||' )';
       end;
 
    member function get_any_data_object_name return varchar2 is

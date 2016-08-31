@@ -150,7 +150,7 @@ describe 'Build any_data object from anydata' do
    a18 => to_timestamp_tz( '2015-11-21 20:01:01.123456789 -04:00', 'yyyy-mm-dd hh24:mi:ssxff9 tzh:tzm' ),
    a19 => to_timestamp   ( '2015-11-21 20:01:01.123456789', 'yyyy-mm-dd hh24:mi:ssxff9' )
 )"
-        expected   = "generic_util.datatype_obj(
+        expected   = "GENERIC_UTIL.DATATYPE_OBJ(
    a01 => 1.23456789E+002,
    a02 => 1.23456001E+002,
    a03 => '1234%$#$%DRGSDFG$#%',
@@ -176,9 +176,9 @@ describe 'Build any_data object from anydata' do
 
       it 'converts nested object into string representation' do
         test_object="test_parent_object( 1234, test_obj( 'some characters', 1234567890.12345678901) )"
-        expected   = "generic_util.test_parent_object(
+        expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
    some_id => 1234,
-   child_obj => generic_util.test_obj(
+   child_obj => GENERIC_UTIL.TEST_OBJ(
       text => 'some characters',
       id => 1234567890.12345678901
    )
@@ -188,10 +188,10 @@ describe 'Build any_data object from anydata' do
 
       it 'converts an object containing a collection into string representation' do
         test_col_obj="test_col_obj( to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ), 'some characters', test_col( 1, 2, 3.456, 7.8, 9 ), 1.23 )"
-        expected    = "generic_util.test_col_obj(
+        expected    = "GENERIC_UTIL.TEST_COL_OBJ(
    a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
    a_char => 'some characters',
-   a_col => generic_util.test_col(
+   a_col => GENERIC_UTIL.TEST_COL(
       1,
       2,
       3.456,
@@ -210,7 +210,7 @@ describe 'Build any_data object from anydata' do
 
       it 'converts collection of primitives into string representation' do
         test_collection='test_col( 1, 2, 3.456, 7.8, 9 )'
-        expected       = 'generic_util.test_col(
+        expected       = 'GENERIC_UTIL.TEST_COL(
    1,
    2,
    3.456,
@@ -224,12 +224,12 @@ describe 'Build any_data object from anydata' do
       it 'converts collection of objects into string representation' do
         test_object    ="test_obj('test',1)"
         test_collection="test_obj_col( #{test_object},#{test_object} )"
-        expected       = "generic_util.test_obj_col(
-   generic_util.test_obj(
+        expected       = "GENERIC_UTIL.TEST_OBJ_COL(
+   GENERIC_UTIL.TEST_OBJ(
       text => 'test',
       id => 1
    ),
-   generic_util.test_obj(
+   GENERIC_UTIL.TEST_OBJ(
       text => 'test',
       id => 1
    )
@@ -239,15 +239,15 @@ describe 'Build any_data object from anydata' do
 
       it 'converts collection of collections into string representation' do
         test_collection='test_col_col(test_col( 1, 2, 3.456, 7.8, 9 ), test_col( 4,5,6,7.89 ))'
-        expected       = 'generic_util.test_col_col(
-   generic_util.test_col(
+        expected       = 'GENERIC_UTIL.TEST_COL_COL(
+   GENERIC_UTIL.TEST_COL(
       1,
       2,
       3.456,
       7.8,
       9
    ),
-   generic_util.test_col(
+   GENERIC_UTIL.TEST_COL(
       4,
       5,
       6,
@@ -261,20 +261,20 @@ describe 'Build any_data object from anydata' do
         test_collection ='test_col( 1, 2 )'
         test_col_obj    ="test_col_obj( TO_DATE( '2015-11-21 20:01:01', 'YYYY-MM-DD HH24:MI:SS' ), 'some characters', #{test_collection}, 1.23 )"
         test_col_obj_col="test_col_obj_col( #{test_col_obj}, #{test_col_obj} )"
-        expected        = "generic_util.test_col_obj_col(
-   generic_util.test_col_obj(
+        expected        = "GENERIC_UTIL.TEST_COL_OBJ_COL(
+   GENERIC_UTIL.TEST_COL_OBJ(
       a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
       a_char => 'some characters',
-      a_col => generic_util.test_col(
+      a_col => GENERIC_UTIL.TEST_COL(
          1,
          2
       ),
       a_num2 => 1.23
    ),
-   generic_util.test_col_obj(
+   GENERIC_UTIL.TEST_COL_OBJ(
       a_date => to_date( '2015-11-21 20:01:01', 'yyyy-mm-dd hh24:mi:ss' ),
       a_char => 'some characters',
-      a_col => generic_util.test_col(
+      a_col => GENERIC_UTIL.TEST_COL(
          1,
          2
       ),
@@ -292,12 +292,12 @@ describe 'Build any_data object from anydata' do
         test_object    ="test_obj('test',1)"
         test_sub_object="test_under_obj('test',1,'description')"
         test_collection="test_obj_col( #{test_object},#{test_sub_object} )"
-        expected       = "generic_util.test_obj_col(
-   generic_util.test_obj(
+        expected       = "GENERIC_UTIL.TEST_OBJ_COL(
+   GENERIC_UTIL.TEST_OBJ(
       text => 'test',
       id => 1
    ),
-   generic_util.test_under_obj(
+   GENERIC_UTIL.TEST_UNDER_OBJ(
       text => 'test',
       id => 1,
       description => 'description'
@@ -308,9 +308,9 @@ describe 'Build any_data object from anydata' do
 
       it 'converts sub-typed object within an object' do
         test_object="test_parent_object( 1234, test_under_obj( 'some characters', 1234567890.12345678901, 'description') )"
-        expected   = "generic_util.test_parent_object(
+        expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
    some_id => 1234,
-   child_obj => generic_util.test_under_obj(
+   child_obj => GENERIC_UTIL.TEST_UNDER_OBJ(
       text => 'some characters',
       id => 1234567890.12345678901,
       description => 'description'

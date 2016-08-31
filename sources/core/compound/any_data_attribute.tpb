@@ -35,6 +35,9 @@ create or replace type body any_data_attribute is
          self.self_type_name := $$PLSQL_UNIT;
          self.name := lower(name);
          self.data_value := data_value;
+         self.name_hash := dbms_crypto.hash( utl_raw.cast_to_raw(self.name), dbms_crypto.HASH_MD5 );
+         self.type_hash := data_value.type_hash;
+         self.value_hash := data_value.value_hash;
          return;
       end;
    constructor function any_data_attribute(

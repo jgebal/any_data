@@ -100,8 +100,10 @@ declare
    v_result boolean;
    v_string varchar2(32767);
 begin
-   open x for select * from user_objects;
-   open y for select * from user_objects;
+--   open x for select * from dba_objects where owner = 'UT3';
+--   open y for select * from dba_objects where owner = 'UT3';
+   open x for select * from dba_tables;
+   open y for select * from dba_tables;
    dbms_profiler.START_PROFILER('any_data_bulder.build( select 98 rows / 14 cols = 1372 fields )');
    a := any_data_builder.build(x);
    dbms_profiler.stop_PROFILER();
@@ -114,10 +116,10 @@ begin
    v_result := b.eq(a);
    dbms_profiler.stop_PROFILER();
 
-   dbms_profiler.START_PROFILER('any_data.to_string(select 98 rows / 14 cols = 1372 fields)'||' times');
-   v_string := b.to_string();
-   dbms_profiler.stop_PROFILER();
-   dbms_output.put_line( v_string );
+--   dbms_profiler.START_PROFILER('any_data.to_string(select 98 rows / 14 cols = 1372 fields)'||' times');
+--   v_string := b.to_string();
+--   dbms_profiler.stop_PROFILER();
+--   dbms_output.put_line( v_string );
 end;
 /
 
@@ -129,13 +131,37 @@ declare
    v_result boolean;
    v_string varchar2(32767);
 begin
-   open x for select * from user_objects;
-   open y for select * from user_objects;
+--   open x for select * from dba_objects where owner = 'UT3';
+--   open y for select * from dba_objects where owner = 'UT3';
+   open x for select * from dba_tables;
+   open y for select * from dba_tables;
+   a := any_data_builder.build(x);
+   b := any_data_builder.build(y);
+
+   dbms_profiler.START_PROFILER('any_data.eq( select 98 rows / 14 cols = 1372 fields )');
+   v_result := b.eq(a);
+   dbms_profiler.stop_PROFILER();
+end;
+/
+
+select count(1) from dba_tables;
+select count(1) from dba_Tab_Columns where table_name = 'DBA_TABLES';
+
+declare
+   x sys_refcursor;
+   y sys_refcursor;
+   a any_data;
+   b any_data;
+   v_result boolean;
+   v_string varchar2(32767);
+begin
+   open x for select * from dba_tables;
+   open y for select * from dba_tables;
    a := any_data_builder.build(x);
    b := any_data_builder.build(y);
    v_result := b.eq(a);
    v_string := b.to_string();
-   dbms_output.put_line( v_string );
+--   dbms_output.put_line( v_string );
 end;
 /
 
@@ -179,11 +205,20 @@ declare
   x raw(16);
 begin
   for i in 1 .. 5000 loop
-   x := sys.dbms_crypto.hash(to_char(i), dbms_crypto.HASH_MD5);
+   x := sys.dbms_crypto.hash(utl_raw.cast_to_raw(i), dbms_crypto.HASH_MD5);
   end loop;
 end;
 
+begin
+  dbms_output.put_line('|'||sys.dbms_crypto.hash(to_char(null), dbms_crypto.HASH_MD5 )||'|');
+end;
 
 select * From dba_tab_privs where table_name = 'DBMS_CRYPTO';
 
 --grant execute on dbms_crypto to dba;
+
+begin
+dbms_output.put_line(rawtohex('ABCD'));--convert char to hex,
+dbms_output.put_line(hextoraw('AA'));
+end;
+

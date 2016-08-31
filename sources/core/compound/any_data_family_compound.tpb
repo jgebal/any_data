@@ -27,20 +27,41 @@ create or replace type body any_data_family_compound as
          return v_result;
       end;
 
-   overriding member procedure add_element( self in out nocopy any_data_family_compound, p_attribute any_data ) is
-      begin
-         data_values.extend;
-         data_values( data_values.last ) := p_attribute;
-      end;
-
-   overriding member function get_element( p_position integer ) return any_data is
-      begin
-         return data_values( p_position );
-      end;
-
    overriding member function get_elements_count return integer is
       begin
          return cardinality( data_values );
+      end;
+
+   member procedure set_data_values(self in out nocopy any_data_family_compound, p_data_values any_data_tab) is
+      c_cardinlaity constant integer := coalesce(cardinality(p_data_values),0);
+      l_name_hashes raw(1600);
+      l_type_hashes raw(1600);
+      l_value_hashes raw(1600);
+      i integer := 1;
+      x integer;
+      begin
+         self.data_values := p_data_values;
+--         for i in 1 .. c_cardinlaity loop
+--            self.name_hash := dbms_crypto.hash( self.name_hash||data_values(i).name_hash, dbms_crypto.HASH_MD5 );
+--            self.type_hash := dbms_crypto.hash( self.type_hash||data_values(i).type_hash, dbms_crypto.HASH_MD5 );
+--            self.value_hash := dbms_crypto.hash( self.value_hash||data_values(i).value_hash, dbms_crypto.HASH_MD5 );
+--         end loop;
+         loop
+            exit when i >= c_cardinlaity;
+            x := least(i+99,c_cardinlaity);
+            for j in i .. x loop
+               l_name_hashes := l_name_hashes||data_values(j).name_hash;
+               l_type_hashes := l_name_hashes||data_values(j).type_hash;
+               l_value_hashes := l_name_hashes||data_values(j).value_hash;
+            end loop;
+            self.name_hash := dbms_crypto.hash( self.name_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
+            self.type_hash := dbms_crypto.hash( self.type_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
+            self.value_hash := dbms_crypto.hash( self.value_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
+            l_name_hashes := null;
+            l_type_hashes := null;
+            l_value_hashes := null;
+            i := i + 100;
+         end loop;
       end;
 
    overriding member function compare_internal( p_other any_data ) return integer is

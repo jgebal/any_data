@@ -13,7 +13,7 @@ create or replace type body any_data as
          v_array := to_string_array( );
          v_array_size := cardinality( v_array );
          for i in 1 .. v_array_size  loop
-            if length(v_result) + length(v_array(i)) > 32767 then
+            if length(v_result) + length(v_array(i)) >= 32767 then
                v_result := substr( v_result, 1, 32764) || '...';
                exit;
             else
@@ -28,19 +28,17 @@ create or replace type body any_data as
          return self_type_name;
       end;
 
-   member procedure add_element( self in out nocopy any_data, p_attribute any_data ) is
-      begin
-         raise_application_error( -20000, 'Feature not available for ' || get_self_type_name( ) || ' type' );
-      end;
-
-   member function get_element( p_position integer ) return any_data is
-      begin
-         return self;
-      end;
-
    member function get_elements_count return integer is
       begin
          return 1;
+      end;
+
+   map member function get_hash return raw is
+      begin
+         return
+            nvl( value_hash, any_data_const.null_hash_value )
+            || nvl( type_hash, any_data_const.null_hash_value )
+            || nvl( name_hash, any_data_const.null_hash_value );
       end;
 
    member function compare_internal( p_other any_data ) return integer is
@@ -73,7 +71,7 @@ create or replace type body any_data as
          return v_result;
       end;
 
-   order member function compare( p_other any_data ) return integer is
+   final member function compare( p_other any_data ) return integer is
       begin
          return
             case
@@ -86,7 +84,7 @@ create or replace type body any_data as
 
    member function equals( p_other any_data ) return boolean is
       begin
-          return coalesce( compare( p_other ) = 0, false );
+          return case when p_other is not null then self.get_hash() = p_other.get_hash() else false end;
       end;
 
    final member function not_equals( p_other any_data ) return boolean is

@@ -3,9 +3,9 @@ create or replace type body any_data_object as
    constructor function any_data_object( self in out nocopy any_data_object, type_name varchar2, data_values any_data_tab ) return self as result is
       begin
          self.type_code := dbms_types.typecode_object;
-         self.type_name := lower(type_name);
+         self.type_name := type_name;
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 
@@ -14,9 +14,9 @@ create or replace type body any_data_object as
    ) return self as result is
       begin
          self.type_code := dbms_types.typecode_object;
-         self.type_name := lower(type_name);
+         self.type_name := type_name;
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 end;

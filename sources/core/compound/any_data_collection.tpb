@@ -5,7 +5,7 @@ create or replace type body any_data_collection as
          self.type_code := dbms_types.typecode_table;
          self.type_name := type_name;
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 
@@ -14,9 +14,9 @@ create or replace type body any_data_collection as
    ) return self as result is
       begin
          self.type_code := type_code;
-         self.type_name := lower(type_name);
+         self.type_name := type_name;
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 

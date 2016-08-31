@@ -8,7 +8,7 @@ create or replace type body any_data_result_set as
          self.type_name := 'RESULT_SET';
          self.self_type_name := $$PLSQL_UNIT;
          self.data_values := data_values;
-         self.column_names := column_names;
+         self.set_data_values( data_values );
          return;
       end;
 
@@ -21,7 +21,7 @@ create or replace type body any_data_result_set as
          self.type_name := 'RESULT_SET';
          self.self_type_name := $$PLSQL_UNIT;
          self.data_values := data_values;
-         self.column_names := column_names;
+         self.set_data_values( data_values );
          return;
       end;
 

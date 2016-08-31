@@ -1,6 +1,6 @@
 create or replace package body any_data_typecode_mapper as
 
-   function get_dbms_types_mapping( p_type_code binary_integer ) return dbms_type_code_mappings%rowtype result_cache is
+   function get_dbms_types_mapping( p_type_code binary_integer ) return dbms_type_code_mappings%rowtype result_cache deterministic is
       v_result dbms_type_code_mappings%rowtype;
       begin
          select m.*
@@ -12,7 +12,7 @@ create or replace package body any_data_typecode_mapper as
          raise_application_error( -20000, 'Unsupported typecode = '|| p_type_code );
       end;
 
-   function get_dbms_sql_mapping( p_dbms_sql_typecode binary_integer ) return dbms_type_code_mappings%rowtype result_cache is
+   function get_dbms_sql_mapping( p_dbms_sql_typecode binary_integer ) return dbms_type_code_mappings%rowtype result_cache deterministic is
       v_result dbms_type_code_mappings%rowtype;
       begin
          select m.*

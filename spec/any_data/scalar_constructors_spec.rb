@@ -2,20 +2,19 @@
 shared_examples 'any data constructor for scalar types' do |params|
 
   object_type = params[:self_type_name].to_sym
-  expected    = params
+  expected    = params.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
 
   it 'creates instance of object using full constructor' do
     result = plsql.send(object_type, expected)
-    expect(result).to eq(expected)
+    expect(result.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})).to eq(expected)
   end
 
   it 'creates instance of object using data value only' do
     result = plsql.send(object_type, expected[:data_value])
-    expect(result).to eq(expected)
+    expect(result.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})).to eq(expected)
   end
 
 end
-
 describe 'any_data construction' do
   [
     # Disabled as ruby-plsql 0.5.3 does not support binary_double, binary_float and interval datatypes
@@ -53,7 +52,7 @@ describe 'any_data construction' do
 
       expect(
         plsql.any_data_collection( expected )
-      ).to eq(expected)
+      ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
     it 'creates instance of object using data values and type name' do
@@ -66,7 +65,7 @@ describe 'any_data construction' do
 
       expect(
         plsql.any_data_collection( expected[:type_name], expected[:data_values]  )
-      ).to eq(expected)
+      ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
   end
@@ -83,7 +82,7 @@ describe 'any_data construction' do
 
       expect(
         plsql.any_data_object( expected )
-      ).to eq(expected)
+      ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
     it 'creates instance of object using data values and type name' do
@@ -96,7 +95,7 @@ describe 'any_data construction' do
 
       expect(
         plsql.any_data_object( expected[:type_name], expected[:data_values]  )
-      ).to eq(expected)
+      ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
   end

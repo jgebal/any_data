@@ -7,7 +7,7 @@ create or replace type body any_data_result_row as
          self.type_code := null;
          self.type_name := 'RESULT_ROW';
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 
@@ -19,7 +19,7 @@ create or replace type body any_data_result_row as
          self.type_code := null;
          self.type_name := 'RESULT_ROW';
          self.self_type_name := $$PLSQL_UNIT;
-         self.data_values := data_values;
+         self.set_data_values( data_values );
          return;
       end;
 
