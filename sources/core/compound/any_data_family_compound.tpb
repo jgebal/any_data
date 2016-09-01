@@ -33,34 +33,30 @@ create or replace type body any_data_family_compound as
       end;
 
    member procedure set_data_values(self in out nocopy any_data_family_compound, p_data_values any_data_tab) is
-      c_cardinlaity constant integer := coalesce(cardinality(p_data_values),0);
+      c_cardinality constant integer := coalesce(cardinality(p_data_values),0);
       l_name_hashes raw(1600);
       l_type_hashes raw(1600);
       l_value_hashes raw(1600);
-      i integer := 1;
-      x integer;
+      l_step constant integer := 100;
+      a integer := 1;
+      b integer := least( l_step, c_cardinality );
       begin
          self.data_values := p_data_values;
---         for i in 1 .. c_cardinlaity loop
---            self.name_hash := dbms_crypto.hash( self.name_hash||data_values(i).name_hash, dbms_crypto.HASH_MD5 );
---            self.type_hash := dbms_crypto.hash( self.type_hash||data_values(i).type_hash, dbms_crypto.HASH_MD5 );
---            self.value_hash := dbms_crypto.hash( self.value_hash||data_values(i).value_hash, dbms_crypto.HASH_MD5 );
---         end loop;
          loop
-            exit when i >= c_cardinlaity;
-            x := least(i+99,c_cardinlaity);
-            for j in i .. x loop
-               l_name_hashes := l_name_hashes||data_values(j).name_hash;
-               l_type_hashes := l_name_hashes||data_values(j).type_hash;
-               l_value_hashes := l_name_hashes||data_values(j).value_hash;
+            exit when a > c_cardinality;
+            for i in a .. b loop
+               l_name_hashes  := l_name_hashes||data_values(i).name_hash;
+               l_type_hashes  := l_type_hashes||data_values(i).type_hash;
+               l_value_hashes := l_value_hashes||data_values(i).value_hash;
             end loop;
             self.name_hash := dbms_crypto.hash( self.name_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
-            self.type_hash := dbms_crypto.hash( self.type_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
-            self.value_hash := dbms_crypto.hash( self.value_hash||l_name_hashes, dbms_crypto.HASH_MD5 );
+            self.type_hash := dbms_crypto.hash( self.type_hash||l_type_hashes, dbms_crypto.HASH_MD5 );
+            self.value_hash := dbms_crypto.hash( self.value_hash||l_value_hashes, dbms_crypto.HASH_MD5 );
             l_name_hashes := null;
             l_type_hashes := null;
             l_value_hashes := null;
-            i := i + 100;
+            a := a + l_step;
+            b := least( b + l_step, c_cardinality );
          end loop;
       end;
 
