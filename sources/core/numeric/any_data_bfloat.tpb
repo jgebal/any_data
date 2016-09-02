@@ -1,5 +1,4 @@
-create or replace
-type body any_data_bfloat as
+create or replace type body any_data_bfloat as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       begin
@@ -12,9 +11,15 @@ type body any_data_bfloat as
          self.type_name := 'BINARY_FLOAT';
          self.self_type_name := $$PLSQL_UNIT;
          self.data_value := p_data;
-         self.type_hash := dbms_crypto.hash( utl_raw.cast_to_raw(self.type_name), dbms_crypto.HASH_MD5 );
-         self.value_hash := dbms_crypto.hash( utl_raw.cast_to_raw( data_value ), dbms_crypto.HASH_MD5 );
          return;
+      end;
+
+   overriding member function get_value_hash return raw is
+      begin
+         return
+            case when self.data_value is null then any_data_const.null_hash_value
+            else dbms_crypto.hash( utl_raw.cast_to_raw( self.data_value ), dbms_crypto.HASH_MD5 )
+            end;
       end;
 
 end;

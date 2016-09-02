@@ -33,12 +33,19 @@ create or replace type body any_data as
          return 1;
       end;
 
+   member function get_type_hash return raw is
+      begin
+         return dbms_crypto.hash( utl_raw.cast_to_raw(type_code), dbms_crypto.HASH_MD5 );
+      end;
+
+   member function get_name_hash return raw is
+      begin
+         return any_data_const.null_hash_value;
+      end;
+
    map member function get_hash return raw is
       begin
-         return
-            nvl( value_hash, any_data_const.null_hash_value )
-            || nvl( type_hash, any_data_const.null_hash_value )
-            || nvl( name_hash, any_data_const.null_hash_value );
+         return get_type_hash()||get_value_hash()||get_name_hash();
       end;
 
    member function compare_internal( p_other any_data ) return integer is
