@@ -71,48 +71,19 @@ declare
    v_result boolean;
    v_string varchar2(32767);
 begin
-   open x for select * from user_procedures;
-   open y for select * from user_procedures;
-   dbms_profiler.START_PROFILER('any_data_bulder.build( select 192 rows / 14 cols = 2688 fields )');
-   a := any_data_builder.build(x);
-   dbms_profiler.stop_PROFILER();
-
-   dbms_profiler.START_PROFILER('any_data_bulder.build( select 192 rows / 14 cols = 2688 fields )');
-   b := any_data_builder.build(y);
-   dbms_profiler.stop_PROFILER();
-
-   dbms_profiler.START_PROFILER('any_data.eq( select 192 rows / 14 cols = 2688 fields )');
-   v_result := b.eq(a);
-   dbms_profiler.stop_PROFILER();
-
-   dbms_profiler.START_PROFILER('any_data.to_string(select 192 rows / 14 cols = 2688 fields)'||' times');
-   v_string := b.to_string();
-   dbms_profiler.stop_PROFILER();
-   dbms_output.put_line( v_string );
-end;
-/
-
-declare
-   x sys_refcursor;
-   y sys_refcursor;
-   a any_data;
-   b any_data;
-   v_result boolean;
-   v_string varchar2(32767);
-begin
-   open x for select * from dba_tables where rownum <= 500;
+   open x for select * from dba_tables where rownum <=300;
    dbms_profiler.START_PROFILER('any_data_bulder.build( select 98 rows / 14 cols = 1372 fields )');
    a := any_data_builder.build(x);
    dbms_profiler.stop_PROFILER();
 
---   open y for select * from dba_tables where rownum <= 50;
---   dbms_profiler.START_PROFILER('any_data_bulder.build( select 98 rows / 14 cols = 1372 fields )');
---   b := any_data_builder.build(y);
---   dbms_profiler.stop_PROFILER();
---
---   dbms_profiler.START_PROFILER('any_data.eq( select 98 rows / 14 cols = 1372 fields )');
---   v_result := b.eq(a);
---   dbms_profiler.stop_PROFILER();
+   open y for select * from dba_tables where rownum <= 300;
+   dbms_profiler.START_PROFILER('any_data_bulder.build( select 98 rows / 14 cols = 1372 fields )');
+   b := any_data_builder.build(y);
+   dbms_profiler.stop_PROFILER();
+
+   dbms_profiler.START_PROFILER('any_data.eq( select 98 rows / 14 cols = 1372 fields )');
+   v_result := b.eq(a);
+   dbms_profiler.stop_PROFILER();
 
 --   dbms_profiler.START_PROFILER('any_data.to_string(select 98 rows / 14 cols = 1372 fields)'||' times');
 --   v_string := b.to_string();
@@ -121,7 +92,7 @@ begin
 end;
 /
 
-select runid,
+select plsql_profiler_runs.runid,
                plsql_profiler_runs.run_comment,
                plsql_profiler_runs.run_total_time/1000000 as total_time_mili_sec,
                sum(plsql_profiler_data.total_occur) over (partition by plsql_profiler_units.runid) as total_line_executions,
@@ -156,19 +127,21 @@ declare
 begin
    open x for select * from dba_tables where rownum <= 10;
    a := treat( any_data_builder.build(x) as any_data_result_set);
-   dbms_output.put_line('a.type_hash='||a.type_hash);
-   dbms_output.put_line('a.value_hash='||a.value_hash);
-   dbms_output.put_line('a.name_hash='||a.name_hash);
+   dbms_output.put_line('a.get_type_hash='||a.get_type_hash);
+   dbms_output.put_line('a.get_value_hash='||a.get_value_hash);
+   dbms_output.put_line('a.get_name_hash='||a.get_name_hash);
 
-   dbms_output.put_line('a.data_values(1).type_hash='||a.data_values(1).type_hash);
-   dbms_output.put_line('a.data_values(1).value_hash='||a.data_values(1).value_hash);
-   dbms_output.put_line('a.data_values(1).name_hash='||a.data_values(1).name_hash);
+   dbms_output.put_line('a.data_values(1).get_type_hash='||a.data_values(1).get_type_hash);
+   dbms_output.put_line('a.data_values(1).get_value_hash='||a.data_values(1).get_value_hash);
+   dbms_output.put_line('a.data_values(1).get_name_hash='||a.data_values(1).get_name_hash);
 
    b := treat( a.data_values(1) as any_data_result_row);
 
-   dbms_output.put_line('b.data_values(1).type_hash='||b.data_values(1).type_hash);
-   dbms_output.put_line('b.data_values(1).value_hash='||b.data_values(1).value_hash);
-   dbms_output.put_line('b.data_values(1).name_hash='||b.data_values(1).name_hash);
+   dbms_output.put_line('a.data_values(1).data_values(1).get_type_hash='||b.data_values(1).get_type_hash);
+   dbms_output.put_line('a.data_values(1).data_values(1).get_value_hash='||b.data_values(1).get_value_hash);
+   dbms_output.put_line('a.data_values(1).data_values(1).get_name_hash='||b.data_values(1).get_name_hash);
 end;
 /
 
+
+select dbms_crypto.hash( cast( 'aaa' as raw ) , /*dbms_crypto.HASH_MD5*/2 ) from dual;
