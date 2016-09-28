@@ -40,16 +40,6 @@ create or replace type body any_data_attribute is
          self.value_hash := data_value.value_hash;
          return;
       end;
-   constructor function any_data_attribute(
-      self in out nocopy any_data_attribute, type_code number, type_name varchar2, self_type_name varchar2, name varchar2, data_value any_data
-   ) return self as result is
-      begin
-         self.self_type_name := $$PLSQL_UNIT;
-         self.name := lower(name);
-         self.data_value := data_value;
-         return;
-      end;
-
 
 end;
 /

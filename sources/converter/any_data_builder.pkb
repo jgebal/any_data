@@ -39,7 +39,7 @@ create or replace package body any_data_builder as
         return any_data_formatter.indent_lines( p_string, p_times );
       end;
 
-   function build_sql( p_type any_type_mapper, p_data_breadcrumb varchar2, p_return_assignment varchar2 := ':p_out := '||c_value||';', p_level integer := 1 ) return varchar2 is
+   function build_sql( p_type any_type_mapper, p_data_breadcrumb varchar2, p_return_assignment varchar2 := c_indent||':p_out := '||c_value||';', p_level integer := 1 ) return varchar2 is
       v_sql               varchar2(32767) := c_sql_block;
       v_declare_sql       varchar2(1000);
       v_return_sql        varchar2(1000);
@@ -60,21 +60,22 @@ create or replace package body any_data_builder as
             v_declare_sql :=
                c_indent||v_out||' any_data_collection := '||p_type.get_any_data_constructor( 'any_data_tab()' )||';'||c_nl||
                c_indent||v_in_iter||' integer := '||v_data_breadcrumb||'.first;'||c_nl||
-               c_indent||v_out_iter||' integer := 1;'
+               c_indent||v_out_iter||' integer := 1;'||c_nl||
+               c_indent||v_out_tab||' any_data_tab := any_data_tab();'
             ;
             v_code_sql :=
-               c_indent||v_out||'.data_values'||'.extend( cardinality( '||v_data_breadcrumb||' ) );' || c_nl ||
+               c_indent||v_out_tab||'.extend( cardinality( '||v_data_breadcrumb||' ) );' || c_nl ||
                c_indent||'while '||v_in_iter||' is not null loop'||c_nl||
-               indent_lines(
-                  build_sql(
-                     p_type.get_attribute_type(), v_data_breadcrumb||'('||v_in_iter||')',
-                     v_out||'.data_values'||'( '||v_out_iter||' ) := ' || c_value || ';', p_level + 1
---                     v_out||'.add_element('||c_value||');', p_level + 1
-                  ), 2
-               )||c_nl||
-               c_indent||c_indent||v_in_iter||' := '||v_data_breadcrumb||'.next('||v_in_iter||');'||c_nl||
-               c_indent||c_indent||v_out_iter||' := '||v_out_iter||' + 1;'||c_nl||
-               c_indent||'end loop;'||c_nl
+                  indent_lines(
+                     build_sql(
+                        p_type.get_attribute_type(), v_data_breadcrumb||'('||v_in_iter||')',
+                        v_out_tab||'( '||v_out_iter||' ) := ' || c_value || ';', p_level + 1
+                     ), 2
+                  )||c_nl||
+                  c_indent||c_indent||v_in_iter||' := '||v_data_breadcrumb||'.next('||v_in_iter||');'||c_nl||
+                  c_indent||c_indent||v_out_iter||' := '||v_out_iter||' + 1;'||c_nl||
+               c_indent||'end loop;'||c_nl||
+               c_indent||v_out||'.set_data_values('||v_out_tab||');'||c_nl
             ;
          elsif p_type.type_code = dbms_types.typecode_object then
             v_declare_sql :=
@@ -86,26 +87,25 @@ create or replace package body any_data_builder as
                v_code_sql := v_code_sql ||
                   indent_lines(
                      'if ' || v_anydata || '.gettypename() != ''' || p_type.get_typename( ) || ''' then' || c_nl ||
-                     c_indent || v_out || ' := treat( any_data_builder.build( ' || v_anydata || ' ) as any_data_object);' || c_nl ||
-                     'else' ||
-                     indent_lines(
-                        build_sql(
-                           p_type.get_attribute_type( i ), v_data_breadcrumb,
-                           v_out_tab||'.extend;' || c_nl || v_out_tab ||'('||v_out_tab||'.last ) := ' || c_value || ';', p_level + 1
---                           v_out || '.add_element(' || c_value || ');', p_level + 1
-                        )||c_nl ||
-                        c_indent||v_out||'.data_values := '||v_out_tab||';'
-                     ) || c_nl ||
+                        c_indent || v_out || ' := treat( any_data_builder.build( ' || v_anydata || ' ) as any_data_object);' || c_nl ||
+                     'else' || c_nl ||
+                        indent_lines(
+                           build_sql(
+                              p_type.get_attribute_type( i ), v_data_breadcrumb,
+                              v_out_tab||'.extend;' || c_nl ||
+                              v_out_tab ||'('||v_out_tab||'.last ) := ' || c_value || ';', p_level + 1
+                           )
+                        ) ||c_nl ||
+                        c_indent||v_out||'.set_data_values('||v_out_tab||');'|| c_nl ||
                      'end if;' || c_nl
                   );
             end loop;
          else
---             v_out := p_type.get_any_data_object_name() || '(' || v_data_breadcrumb || ')';
             v_out := p_type.get_any_data_constructor( v_data_breadcrumb );
          end if;
 
          if p_type.is_attribute then
-            v_return_sql := 'any_data_attribute( NULL, NULL, ''any_data_attribute'', ''' || p_type.attribute_name || ''', ' || v_out || ' )';
+            v_return_sql := 'any_data_attribute( ''' || p_type.attribute_name || ''', ' || v_out || ' )';
          else
             v_return_sql := v_out;
          end if;
@@ -113,7 +113,7 @@ create or replace package body any_data_builder as
 
          if v_declare_sql is not null then
             v_sql := replace( v_sql, c_declare, v_declare_sql );
-            v_sql := replace( v_sql, c_return, c_indent||v_return_sql );
+            v_sql := replace( v_sql, c_return, v_return_sql );
             v_sql := replace( v_sql, c_code, v_code_sql);
          else
             v_sql := v_return_sql;
