@@ -51,7 +51,7 @@ describe 'any_data construction' do
       }
 
       expect(
-        plsql.any_data_collection( expected )
+        plsql.any_data_collection( expected ).merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
       ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
@@ -64,7 +64,7 @@ describe 'any_data construction' do
       }
 
       expect(
-        plsql.any_data_collection( expected[:type_name], expected[:data_values]  )
+        plsql.any_data_collection( expected[:type_name], expected[:data_values]  ).merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
       ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
@@ -81,7 +81,7 @@ describe 'any_data construction' do
       }
 
       expect(
-        plsql.any_data_object( expected )
+        plsql.any_data_object( expected ).merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
       ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 
@@ -94,7 +94,7 @@ describe 'any_data construction' do
       }
 
       expect(
-        plsql.any_data_object( expected[:type_name], expected[:data_values]  )
+        plsql.any_data_object( expected[:type_name], expected[:data_values]  ).merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
       ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
     end
 

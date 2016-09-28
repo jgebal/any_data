@@ -32,6 +32,7 @@ create or replace type any_data authid current_user as object(
    final member function ge( p_other any_data ) return boolean,
    final member function ">="( p_other any_data ) return boolean,
    final member function le( p_other any_data ) return boolean,
-   final member function "<="( p_other any_data ) return boolean
+   final member function "<="( p_other any_data ) return boolean,
+   final member function is_null return boolean
 ) not final not instantiable;
 /

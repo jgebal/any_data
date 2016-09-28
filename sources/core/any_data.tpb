@@ -177,5 +177,10 @@ create or replace type body any_data as
          return less_equal_to( p_other );
       end;
 
+   final member function is_null return boolean is
+      begin
+        return value_hash is null or value_hash = any_data_const.null_hash_value;
+      end;
+
 end;
 /
