@@ -38,18 +38,24 @@ create or replace type body any_data_family_compound as
       l_type_hashes blob;
       l_value_hashes blob;
       begin
-         dbms_lob.createtemporary ( l_name_hashes,  true, dbms_lob.call);
-         dbms_lob.createtemporary ( l_type_hashes,  true, dbms_lob.call);
-         dbms_lob.createtemporary ( l_value_hashes, true, dbms_lob.call);
          self.data_values := p_data_values;
-         for i in 1 ..  c_cardinality loop
-            if data_values(i) is not null and data_values(i).name_hash is not null then dbms_lob.writeappend( l_name_hashes,  16,  data_values(i).name_hash ); end if;
-            if data_values(i) is not null and data_values(i).type_hash is not null then dbms_lob.writeappend( l_type_hashes,  16,  data_values(i).type_hash ); end if;
-            if data_values(i) is not null and data_values(i).value_hash is not null then dbms_lob.writeappend( l_value_hashes, 16, data_values(i).value_hash ); end if;
-         end loop;
-         self.name_hash := dbms_crypto.hash( l_name_hashes, dbms_crypto.HASH_MD5 );
-         self.type_hash := dbms_crypto.hash( l_type_hashes, dbms_crypto.HASH_MD5 );
-         self.value_hash := dbms_crypto.hash( l_value_hashes, dbms_crypto.HASH_MD5 );
+         if c_cardinality > 0 then
+            dbms_lob.createtemporary ( l_name_hashes,  true, dbms_lob.call);
+            dbms_lob.createtemporary ( l_type_hashes,  true, dbms_lob.call);
+            dbms_lob.createtemporary ( l_value_hashes, true, dbms_lob.call);
+            for i in 1 ..  c_cardinality loop
+               if data_values(i) is not null and data_values(i).name_hash is not null then dbms_lob.writeappend( l_name_hashes,  16,  data_values(i).name_hash ); end if;
+               if data_values(i) is not null and data_values(i).type_hash is not null then dbms_lob.writeappend( l_type_hashes,  16,  data_values(i).type_hash ); end if;
+               if data_values(i) is not null and data_values(i).value_hash is not null then dbms_lob.writeappend( l_value_hashes, 16, data_values(i).value_hash ); end if;
+            end loop;
+            self.name_hash := dbms_crypto.hash( l_name_hashes, dbms_crypto.HASH_MD5 );
+            self.type_hash := dbms_crypto.hash( l_type_hashes, dbms_crypto.HASH_MD5 );
+            self.value_hash := dbms_crypto.hash( l_value_hashes, dbms_crypto.HASH_MD5 );
+         else
+            self.name_hash :=  any_data_const.null_hash_value;
+            self.type_hash :=  any_data_const.null_hash_value;
+            self.value_hash := any_data_const.null_hash_value;
+         end if;
       end;
 
    overriding member function compare_internal( p_other any_data ) return integer is
