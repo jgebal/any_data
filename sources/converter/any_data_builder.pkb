@@ -59,11 +59,14 @@ create or replace package body any_data_builder as
          if p_type.type_code in ( dbms_types.typecode_table, dbms_types.typecode_varray, dbms_types.typecode_namedcollection ) then
             v_declare_sql :=
                c_indent||v_out||' any_data_collection := '||p_type.get_any_data_constructor( 'any_data_tab()' )||';'||c_nl||
-               c_indent||v_in_iter||' integer := '||v_data_breadcrumb||'.first;'||c_nl||
+               c_indent||v_in_iter||' integer;'||c_nl||
                c_indent||v_out_iter||' integer := 1;'||c_nl||
                c_indent||v_out_tab||' any_data_tab := any_data_tab();'
             ;
             v_code_sql :=
+               c_indent||'if '||v_data_breadcrumb||' is not null then'||c_nl||
+               c_indent||c_indent||v_in_iter||' := '||v_data_breadcrumb||'.first;'||c_nl||
+               c_indent||'end if;'||c_nl||
                c_indent||v_out_tab||'.extend( cardinality( '||v_data_breadcrumb||' ) );' || c_nl ||
                c_indent||'while '||v_in_iter||' is not null loop'||c_nl||
                   indent_lines(
@@ -88,7 +91,7 @@ create or replace package body any_data_builder as
                   indent_lines(
                      'if ' || v_anydata || '.gettypename() != ''' || p_type.get_typename( ) || ''' then' || c_nl ||
                         c_indent || v_out || ' := treat( any_data_builder.build( ' || v_anydata || ' ) as any_data_object);' || c_nl ||
-                     'else' || c_nl ||
+                     'elsif ' || v_data_breadcrumb || ' is not null then ' || c_nl ||
                         indent_lines(
                            build_sql(
                               p_type.get_attribute_type( i ), v_data_breadcrumb,
