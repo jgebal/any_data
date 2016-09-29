@@ -7,7 +7,7 @@ create or replace type body any_data_family_compound as
 
    overriding member function to_string_array( p_separator varchar2 := null ) return string_array is
       v_result         string_array;
-      v_values_count   binary_integer := get_elements_count();
+      v_values_count   integer := nvl(get_elements_count(),0);
       v_elements       string_array;
       v_separator      varchar2(1) := ',';
       begin
