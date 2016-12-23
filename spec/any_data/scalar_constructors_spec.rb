@@ -95,7 +95,7 @@ describe 'any_data construction' do
 
       expect(
         plsql.any_data_object( expected[:type_name], expected[:data_values]  ).merge({type_hash: NULL, value_hash: NULL, name_hash: NULL})
-      ).to eq(expected.merge({type_hash: NULL, value_hash: NULL, name_hash: NULL}))
+      ).to eq(expected)
     end
 
   end

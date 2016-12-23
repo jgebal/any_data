@@ -177,10 +177,9 @@ describe 'Build any_data object from anydata' do
       it 'converts nested object into string representation' do
         test_object="test_parent_object( 1234, test_obj( 'some characters', 1234567890.12345678901) )"
         expected   = "GENERIC_UTIL.TEST_PARENT_OBJECT(
-   some_id => 1234,
-   child_obj => GENERIC_UTIL.TEST_OBJ(
-      text => 'some characters',
-      id => 1234567890.12345678901
+some_id => 1234, child_obj => GENERIC_UTIL.TEST_OBJ(
+text => 'some characters',
+id => 1234567890.12345678901
    )
 )"
         expect(return_string_value "anydata.ConvertObject( #{test_object} )").to eq expected
